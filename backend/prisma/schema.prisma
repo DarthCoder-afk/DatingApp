@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int        @id @default(autoincrement())
+  email          String     @unique
+  password       String
+  createdAt      DateTime   @default(now())
+  profile        Profile?
+  likesGiven     Like[]     @relation("LikesGiven")
+  likesReceived  Like[]     @relation("LikesReceived")
+  matches        Match[]    @relation("UserMatches")
+  messages       Message[]  @relation("UserMessages") 
+}
+
+model Profile {
+  id        Int     @id @default(autoincrement())
+  name      String
+  age       Int
+  bio       String?
+  photoUrl  String?
+  userId    Int     @unique
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  fromId    Int
+  toId      Int
+  from      User     @relation("LikesGiven", fields: [fromId], references: [id])
+  to        User     @relation("LikesReceived", fields: [toId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Match {
+  id        Int       @id @default(autoincrement())
+  users     User[]    @relation("UserMatches")
+  messages  Message[] @relation("MatchMessages") 
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  matchId   Int
+  senderId  Int
+  content   String
+  createdAt DateTime @default(now())
+  match     Match    @relation("MatchMessages", fields: [matchId], references: [id])
+  sender    User     @relation("UserMessages", fields: [senderId], references: [id])
+}
