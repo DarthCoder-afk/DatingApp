@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 import cors from 'cors';
 import morgan from 'morgan';
 
@@ -17,10 +18,7 @@ app.use(morgan('dev'));
 
 
 app.use('/api/auths', authRoutes);
-
-app.get('/', (req, res) => {
-  res.send('Backend is running!');
-});
+app.use('/api/profiles', profileRoutes);
 
 
 app.listen(PORT, () => {

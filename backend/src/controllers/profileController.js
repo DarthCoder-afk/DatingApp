@@ -1,4 +1,4 @@
-import prisma from '../prisma/client.js';
+import { Prisma } from "@prisma/client";
 
 export const getUserProfile = async (req, res) =>{
     try {
