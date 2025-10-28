@@ -57,15 +57,48 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    //Validate inputs
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required." });
+    }
 
+    //Find the user and include profile
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    //Verify password
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ message: "Invalid password" });
+    if (!valid) {
+      return res.status(400).json({ message: "Invalid email or password." });
+    }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.json({ token, user });
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
+
+    // Remove password before sending user data
+    const { password: _, ...userWithoutPassword } = user;
+
+    // Respond with token and safe user data
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: userWithoutPassword,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({
+      message: "Login failed",
+      error: error.message,
+    });
   }
 };
