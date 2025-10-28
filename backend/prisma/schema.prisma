@@ -29,7 +29,8 @@ model Profile {
   id        Int     @id @default(autoincrement())
   name      String
   age       Int
-  bio       String?
+  bio       String
+  gender    String?
   photoUrl  String?
   userId    Int     @unique
   user      User    @relation(fields: [userId], references: [id])
