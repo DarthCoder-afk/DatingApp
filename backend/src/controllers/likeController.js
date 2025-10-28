@@ -2,7 +2,7 @@ import prisma from "../../prisma/client.js";
 
 export const sendLike = async (req, res) => {
     const fromId = req.user.id;
-    const  toId = parseInt(req.params.userId);
+    const toId = parseInt(req.params.toUserId);
 
     try {
         // Prevent liking onself
@@ -36,9 +36,6 @@ export const sendLike = async (req, res) => {
             data: { fromId, toId },
         });
 
-        res.status(201).json({ message: "Like sent successfully", like: newLike });
-
-
         // Check for a match
         const matchLike = await prisma.like.findFirst({
             where: { fromId: toId, toId: fromId }
@@ -46,7 +43,7 @@ export const sendLike = async (req, res) => {
 
         if (matchLike) {
             await prisma.match.create({
-                data: {
+               data: {
                     users: { connect: [{ id: fromId }, { id: toId }] }
                 },
             });
@@ -55,7 +52,7 @@ export const sendLike = async (req, res) => {
         res.status(201).json({ message: "Like sent successfully", like: newLike, match: false });
     } catch (error) {
         console.error("Error sending like:", error);
-        res.status(500).json({ message: "Internal server error." });    
+        res.status(500).json({ message: "Error sending like." });
     }
 };
 

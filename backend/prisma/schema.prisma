@@ -14,26 +14,26 @@ datasource db {
 }
 
 model User {
-  id             Int        @id @default(autoincrement())
-  email          String     @unique
-  password       String
-  createdAt      DateTime   @default(now())
-  profile        Profile?
-  likesGiven     Like[]     @relation("LikesGiven")
-  likesReceived  Like[]     @relation("LikesReceived")
-  matches        Match[]    @relation("UserMatches")
-  messages       Message[]  @relation("UserMessages") 
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  createdAt     DateTime  @default(now())
+  profile       Profile?
+  likesGiven    Like[]    @relation("LikesGiven")
+  likesReceived Like[]    @relation("LikesReceived")
+  matches       Match[]   @relation("UserMatches")
+  messages      Message[] @relation("UserMessages")
 }
 
 model Profile {
-  id        Int     @id @default(autoincrement())
-  name      String
-  age       Int
-  bio       String
-  gender    String?
-  photoUrl  String?
-  userId    Int     @unique
-  user      User    @relation(fields: [userId], references: [id])
+  id       Int     @id @default(autoincrement())
+  name     String
+  age      Int
+  bio      String?
+  gender   String
+  photoUrl String?
+  userId   Int     @unique
+  user     User    @relation(fields: [userId], references: [id])
 }
 
 model Like {
@@ -48,7 +48,7 @@ model Like {
 model Match {
   id        Int       @id @default(autoincrement())
   users     User[]    @relation("UserMatches")
-  messages  Message[] @relation("MatchMessages") 
+  messages  Message[] @relation("MatchMessages")
   createdAt DateTime  @default(now())
 }
 
