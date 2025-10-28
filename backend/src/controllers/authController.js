@@ -1,10 +1,12 @@
 import bcrypt from "bcryptjs";
 import { generateToken } from "../config/jwt.js";
 import prisma from "../../prisma/client.js";
+import { uploadToCloudinary } from "../config/cloudinary.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { email, password, name, age, gender, bio, photoUrl} = req.body;
+    const { email, password, name, age, gender, bio} = req.body;
+    const file = req.file;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -18,6 +20,12 @@ export const registerUser = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+
+    let photoUrl = null;
+    if (file) {
+      photoUrl = await uploadToCloudinary(file.buffer, "datingApp_profiles");
+    }
 
     // Create user + profile in one transaction
     const user = await prisma.user.create({

@@ -19,17 +19,32 @@ export const getUserProfile = async (req, res) =>{
 };
 
 export const updateUserProfile = async (req, res) => {
-    try {
-        const { name, age, bio, gender, photoUrl} = req.body;
+  try {
+    const { name, age, bio, gender } = req.body;
+    const file = req.file; // uploaded profile photo
 
-        const updatedProfile = await prisma.profile.update({
-            where : { userId: req.user.id },
-            data : { name, age, bio, gender, photoUrl},
-        });
+    let photoUrl;
 
-        res.json({ message: "Profile updated successfully", profile: updatedProfile });
-    } catch (error) {
-        console.error("Error updating user profile:", error);
-        res.status(500).json({ message: "Internal server error." });
+    if (file) {
+      // Upload to Cloudinary
+      photoUrl = await uploadToCloudinary(file.buffer, "datingapp_profiles");
     }
-}
+
+    // Update profile
+    const updatedProfile = await prisma.profile.update({
+      where: { userId: req.user.id },
+      data: {
+        name,
+        age: age ? parseInt(age) : undefined,
+        bio,
+        gender,
+        ...(photoUrl && { photoUrl }), // only update photo if uploaded
+      },
+    });
+
+    res.json({ message: "Profile updated successfully", profile: updatedProfile });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
