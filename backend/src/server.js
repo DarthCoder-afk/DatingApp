@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import likeRoutes from './routes/likeRoutes.js';
+import matchRoutes from './routes/matchRoute.js';
 import { connectDb } from './config/db.js';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -22,6 +23,7 @@ app.use(morgan('dev'));
 app.use('/api/auths', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/likes', likeRoutes );
+app.use('/api/matches', matchRoutes);
 
 
 connectDb().then(() => {

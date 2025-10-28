@@ -4,6 +4,6 @@ import { getUserMatches } from '../controllers/matchController.js';
 
 const router = express.Router();
 
-router.get('/matches', verifyToken, getUserMatches);
+router.get('/match', verifyToken, getUserMatches);
 
 export default router;
