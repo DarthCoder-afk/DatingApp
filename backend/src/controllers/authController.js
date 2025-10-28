@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateToken } from "../config/jwt.js";
 import prisma from "../../prisma/client.js";
 
 export const registerUser = async (req, res) => {
@@ -76,11 +76,7 @@ export const loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
-    );
+    const token = generateToken(user.id);
 
     // Remove password before sending user data
     const { password: _, ...userWithoutPassword } = user;
