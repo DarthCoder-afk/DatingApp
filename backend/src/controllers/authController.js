@@ -24,7 +24,7 @@ export const registerUser = async (req, res) => {
 
     let photoUrl = null;
     if (file) {
-      photoUrl = await uploadToCloudinary(file.buffer, "datingApp_profiles");
+      photoUrl = await uploadToCloudinary(req.file.buffer);
     }
 
     // Create user + profile in one transaction
@@ -47,10 +47,13 @@ export const registerUser = async (req, res) => {
       },
     });
 
+    const token = generateToken(user.id);
+
     // Return success
     res.status(201).json({
       message: "User and profile created successfully",
       user,
+      token,
     });
   } catch (error) {
     console.error(error);
