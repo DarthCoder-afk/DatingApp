@@ -1,65 +1,106 @@
+"use client";
+
+import Link from "next/link";
+import { Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import Image from "next/image";
+
+const MotionImage = motion(Image);
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen flex flex-col justify-between bg-linear-to-b from-pink-200 to-rose-50 text-gray-800 overflow-hidden">
+      {/* Header */}
+      <motion.header
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="flex justify-between items-center px-8 py-5"
+      >
+        <div
+          className="flex items-center gap-2 text-2xl font-bold text-rose-600"
+         
+        >
+          <Heart className="text-rose-500" size={28} />
+          <span>HeartLink</span>
+        </div>
+
+        <nav className="flex items-center gap-6">
+          <Link href="/login" className="text-gray-700 hover:text-rose-500">
+            Login
+          </Link>
+          <Link
+            href="/register"
+            className="bg-rose-500 text-white px-5 py-2 rounded-full hover:bg-rose-600 transition"
+          >
+            Register
+          </Link>
+        </nav>
+      </motion.header>
+
+      {/* Hero Section */}
+      <section className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6 md:px-10 py-16 md:py-20 -m-t-12 md:-mt-20">
+        {/* Left text content */}
+        <motion.div
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-xl space-y-6 text-center md:text-left md:mr-10"
+        >
+          <p className="text-md text-gray-700">
+            Find meaningful connections.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
+            Find Your <span className="text-rose-600">Perfect Match</span>
+          </h1>
+          <p className="text-lg text-gray-700">
+            Connect with amazing people nearby. Chat, match, and fall in love — all in one app.
+          </p>
+          <div className="order-1 md:order-2 flex justify-center md:justify-start gap-4">
+            <Link
+              href="/register"
+              className="bg-rose-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-rose-700 transition"
+            >
+              Get Started
+            </Link>
+          
+          </div>
+        </motion.div>
+
+        {/* Right illustration */}
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          className="order-2 md:order-1 mt-10 md:mt-0 md:ml-5"
+        >
+          <MotionImage
+            src="/landing page/dating.svg"
+            alt="Dating Illustration"
+            width={450}
+            height={450}
+            className="w-[350px] md:w-[450px]"
+            animate={{ y: [0, -10, 0] }}
+            transition={{
+              repeat: Infinity,
+              duration: 3,
+              ease: "easeInOut",
+            }}
+          />
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="text-center text-sm text-gray-500 py-6"
+      >
+        © {new Date().getFullYear()} HeartLink. All rights reserved.
+      </motion.footer>
+    </main>
+    
   );
 }
