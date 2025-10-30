@@ -48,8 +48,7 @@ export default function LoginPage() {
         </p>
 
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-5">
-          {error && <p className="text-rose-500 text-center">{error}</p>}
-
+      
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
