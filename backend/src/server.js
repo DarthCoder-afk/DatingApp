@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import likeRoutes from './routes/likeRoutes.js';
 import matchRoutes from './routes/matchRoute.js';
+import passRoutes from './routes/passRoutes.js';
 import { connectDb } from './config/db.js';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -29,6 +30,7 @@ app.use('/api/auths', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/likes', likeRoutes );
 app.use('/api/matches', matchRoutes);
+app.use('api/passes', passRoutes)
 
 
 setupSocket(server);
