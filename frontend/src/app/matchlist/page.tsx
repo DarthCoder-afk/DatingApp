@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import Navbar from "@/src/components/NavBar";
+import MatchCard from "@/src/components/MatchCard";
 
 interface Profile {
   id: number;
@@ -101,7 +102,7 @@ export default function MatchListPage() {
     );
 
   return (
-    <div className="min-h-screen bg-rose-50">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-300">
         <Navbar />
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8 mt-8">
         Your Match List 💞
@@ -129,11 +130,12 @@ export default function MatchListPage() {
       {/* Cards Grid */}
       <motion.div
         layout
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        className="grid place-items-center justify-center gap-6
+             grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
         {tab === "mutual" &&
             mutualLikes.map((match) => (
-                <ProfileCard
+                <MatchCard
                 key={match.matchId}
                 profile={match.users[0]?.profile}
                 onUnmatch={() => handleUnmatch(match.matchId)}
@@ -143,7 +145,7 @@ export default function MatchListPage() {
 
         {tab === "given" &&
           likesGiven.map((like) => (
-            <ProfileCard
+            <MatchCard
               key={like.id}
               profile={like.to?.profile}
               buttonLabel="Liked"
@@ -152,7 +154,7 @@ export default function MatchListPage() {
 
         {tab === "received" &&
           likesReceived.map((like) => (
-            <ProfileCard
+            <MatchCard
               key={like.id}
               profile={like.from?.profile}
               buttonLabel="Liked You"
@@ -163,47 +165,4 @@ export default function MatchListPage() {
   );
 }
 
-function ProfileCard({
-  profile,
-  onUnmatch,
-  buttonLabel,
-}: {
-  profile?: Profile;
-  onUnmatch?: () => void;
-  buttonLabel: string;
-}) {
-  if (!profile) return null;
-  const { name, age, bio, photoUrl } = profile;
-  const imgSrc = photoUrl || "/default/default_profile.svg";
 
-  return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="bg-white shadow-md rounded-xl p-4 text-center flex flex-col items-center"
-    >
-      <Image
-        src={imgSrc}
-        alt={name}
-        width={120}
-        height={120}
-        className="w-28 h-28 object-cover rounded-full mb-3"
-      />
-      <h3 className="text-lg font-semibold text-gray-800">
-        {name}, {age}
-      </h3>
-      <p className="text-gray-500 text-sm mb-3 line-clamp-2">{bio}</p>
-
-      <button
-        onClick={onUnmatch}
-        disabled={!onUnmatch}
-        className={`px-4 py-2 rounded-full text-sm font-medium ${
-          onUnmatch
-            ? "bg-rose-600 text-white hover:bg-rose-700 transition"
-            : "bg-gray-200 text-gray-600 cursor-default"
-        }`}
-      >
-        {buttonLabel}
-      </button>
-    </motion.div>
-  );
-}

@@ -84,8 +84,17 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-50">
-      {/* LEFT: Logo */}
+    <nav className="bg-[#f3f3f3] border-b border-gray-200 px-4 md:px-10 py-5 flex items-center justify-between sticky top-0 z-50">
+       {/* Hamburger (visible on mobile) */}
+        <button
+          className="md:hidden text-gray-700"
+          onClick={() => setOpenMobile((p) => !p)}
+          aria-label="Toggle menu"
+        >
+          {openMobile ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+      {/* CENTER: Logo */}
       <div className="flex items-center gap-2">
         <Link href="/home" className="flex items-center gap-2">
           <span className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-rose-600 text-white font-bold">
@@ -102,26 +111,19 @@ export default function Navbar() {
 
       {/* RIGHT SIDE: Profile + Hamburger */}
       <div className="flex items-center gap-4">
-        {/* Hamburger (visible on mobile) */}
-        <button
-          className="md:hidden text-gray-700"
-          onClick={() => setOpenMobile((p) => !p)}
-          aria-label="Toggle menu"
-        >
-          {openMobile ? <X size={24} /> : <Menu size={24} />}
-        </button>
+       
 
         {/* Profile dropdown */}
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setOpenProfile((p) => !p)}
-            className="flex items-center gap-2 border border-gray-200 px-3 py-1 rounded-full hover:shadow-sm"
+            className="flex items-center gap-2 px-3 py-1 rounded-full hover:shadow-sm"
           >
             {profile?.photoUrl ? (
               <Image
                 src={profile.photoUrl}
                 alt={profile.name || "User"}
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-20 h-20 rounded-full object-cover"
                 width={32}
                 height={32}
               />

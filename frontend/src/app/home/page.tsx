@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import ProfileCard from "@/src/components/ProfileCard";
+import {  AnimatePresence } from "framer-motion";
 import NavBar from "@/src/components/NavBar";
 import toast from "react-hot-toast";
 import SwipeCard from "@/src/components/SwipeCard";
@@ -79,32 +78,42 @@ export default function HomePage() {
   if (loading) return <p className="text-center text-gray-500 mt-10">Loading profiles...</p>;
   if (currentIndex >= profiles.length)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-300 flex flex-col">
          <NavBar />
-        <div className=" flex flex-col items-center justify-center">
+        <div className="flex-grow flex flex-col items-center justify-center">
               <p className="text-gray-600 text-xl mt-8">No more profiles to show.</p>
         </div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
+   <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
       <NavBar />
-      <div className="flex flex-col items-center">
-          <div className="relative w-full max-w-md mt-8 h-[500px]">
-                <AnimatePresence>
-                    {profiles.slice(currentIndex, currentIndex + 3).reverse().map((profile, index) => (
-                        <SwipeCard
-                        key={profile.id}
-                        profile={profile}
-                        onLike={() => handleLike(profile.id)}
-                        onPass={() => handlePass(profile.id)}
-                        />
-                    ))}
-                </AnimatePresence>
-                <p className="text-gray-500 mt-4">Swipe → to like, ← to pass</p>
-            </div>
+      <div className="flex flex-col items-center justify-center py-10 px-4">
+        {/* Mobile view: swipe stack */}
+        <div className="w-full max-w-sm h-[500px] relative md:hidden">
+          <AnimatePresence>
+            {profiles.slice(currentIndex, currentIndex + 3).reverse().map((profile) => (
+              <SwipeCard
+                key={profile.id}
+                profile={profile}
+                onLike={() => handleLike(profile.id)}
+                onPass={() => handlePass(profile.id)}
+              />
+            ))}
+          </AnimatePresence>
+          <p className="text-gray-500 mt-4 text-center">Swipe → to like, ← to pass</p>
         </div>
-    </div>
+
+        {/* Desktop view: grid */}
+        <div className="hidden md:grid md:grid-cols-3 md:gap-6 w-full max-w-5xl">
+          {profiles.map((profile) => (
+            <div key={profile.id} className="relative">
+              <SwipeCard profile={profile} onLike={() => handleLike(profile.id)} onPass={() => handlePass(profile.id)} />
+            </div>
+          ))}
+        </div>
+  </div>
+  </div>
   );
 }
