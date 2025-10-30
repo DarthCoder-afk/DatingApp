@@ -45,19 +45,34 @@ export const getUserMatches = async (req, res) => {
  * Unmatch a user — deletes the match and related messages
  */
 export const unmatchUser = async (req, res) => {
-  const { matchId } = req.params;
-
   try {
-    await prisma.match.delete({
-      where: { id: parseInt(matchId) },
+    const matchId = parseInt(req.params.matchId);
+
+    // Check if match exists
+    const match = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: { users: true },
     });
 
-    res.json({ message: "Unmatched successfully." });
+    if (!match) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+
+    // Delete the match
+    await prisma.match.delete({
+      where: { id: matchId },
+    });
+
+    // ✅ Respond with success JSON (important!)
+    return res.status(200).json({ message: "Unmatched successfully" });
   } catch (error) {
-    console.error("Error unmatching user:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error unmatching:", error);
+    return res.status(500).json({ message: "Failed to unmatch" });
   }
 };
+
+
+
 
 /**
  * Get likes overview — outgoing, incoming, and mutual likes

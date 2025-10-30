@@ -22,7 +22,7 @@ interface Like {
 }
 
 interface Match {
-  id: number;
+  matchId: number;
   users: Profile[];
   createdAt: string;
 }
@@ -38,38 +38,58 @@ export default function MatchListPage() {
 
   useEffect(() => {
     const fetchLikes = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/overview`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to load matches");
-        const data = await res.json();
-        console.log("Likes Mutual Data:", data.mutualLikes);
-        setLikesGiven(data.likesGiven || []);
-        setLikesReceived(data.likesReceived || []);
-        setMutualLikes(data.mutualLikes || []);
-      } catch (err: any) {
-        toast.error(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const [overviewRes, matchesRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/overview`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/match`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      if (!overviewRes.ok || !matchesRes.ok)
+        throw new Error("Failed to load matches");
+
+      const overviewData = await overviewRes.json();
+      const matchData = await matchesRes.json();
+
+      setLikesGiven(overviewData.likesGiven || []);
+      setLikesReceived(overviewData.likesReceived || []);
+      setMutualLikes(matchData || []); // ✅ now using real matches
+    } catch (err) {
+      console.error("Error fetching matches:", err);
+      toast.error("Failed to load matches");
+    } finally {
+      setLoading(false);
+    }
+  };
     if (token) fetchLikes();
   }, [token]);
 
+  const fetchMatches = async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/match`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setMutualLikes(data);
+    };
+
   const handleUnmatch = async (matchId: number) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/${matchId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/${matchId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to unmatch");
-      setMutualLikes((prev) => prev.filter((m) => m.id !== matchId));
-      toast.success("Unmatched successfully");
-    } catch (err: any) {
-      toast.error(err.message);
+        });
+
+        if (!res.ok) throw new Error("Failed to unmatch");
+
+        setMutualLikes((prev) => prev.filter((m) => m.matchId !== matchId));
+        fetchMatches();
+        toast.success("Unmatched successfully");
+    } catch (err) {
+        console.error("Error unmatching:", err);
+        toast.error("Failed to unmatch");
     }
   };
 
@@ -114,9 +134,9 @@ export default function MatchListPage() {
         {tab === "mutual" &&
             mutualLikes.map((match) => (
                 <ProfileCard
-                key={match.id}
-                profile={match.to?.profile}
-                onUnmatch={() => handleUnmatch(match.id)}
+                key={match.matchId}
+                profile={match.users[0]?.profile}
+                onUnmatch={() => handleUnmatch(match.matchId)}
                 buttonLabel="Unmatch"
                 />
         ))}
