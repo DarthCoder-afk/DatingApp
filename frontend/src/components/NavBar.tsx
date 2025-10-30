@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 type Profile = {
   id: number;
@@ -71,16 +72,40 @@ export default function Navbar() {
     router.push("/login");
   };
 
+  // ✅ Handle Messages link click
+  const handleMessagesClick = async (e: React.MouseEvent) => {
+    e.preventDefault(); // prevent Link default navigation
+    const token = localStorage.getItem("token");
+    if (!token) return toast.error("Please log in first");
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/conversations`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      if (Array.isArray(data) && data.length === 0) {
+        toast.error("You need to have a match to unlock this 💔");
+      } else {
+        router.push("/messages");
+      }
+    } catch (err) {
+      console.error("Error checking matches:", err);
+      toast.error("Failed to load messages");
+    }
+  };
   const NavLinks = () => (
     <>
       {[
         { href: "/home", label: "Discover" },
         { href: "/matchlist", label: "Matches" },
-        { href: "/messages", label: "Messages" },
-      ].map(({ href, label }) => (
+        { href: "/messages", label: "Messages", onClick: handleMessagesClick },
+      ].map(({ href, label, onClick }) => (
         <Link
           key={href}
           href={href}
+          onClick={onClick}
           className={`px-3 py-2 transition-all duration-200 rounded-md ${
             pathname === href
               ? "text-rose-600 font-semibold bg-rose-100"

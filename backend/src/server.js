@@ -10,6 +10,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import http from 'http';
 import { setupSocket } from './config/socket.js';
+import messageRoutes from './routes/messageRoutes.js'
 
 
 
@@ -31,6 +32,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/likes', likeRoutes );
 app.use('/api/matches', matchRoutes);
 app.use('/api/passes', passRoutes)
+app.use('/api/messages', messageRoutes)
 
 
 setupSocket(server);

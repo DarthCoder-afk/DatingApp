@@ -6,6 +6,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import Navbar from "@/src/components/NavBar";
 import MatchCard from "@/src/components/MatchCard";
+import { useRouter } from "next/navigation";
 
 interface Profile {
   id: number;
@@ -34,6 +35,7 @@ export default function MatchListPage() {
   const [likesReceived, setLikesReceived] = useState<Like[]>([]);
   const [mutualLikes, setMutualLikes] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -138,6 +140,7 @@ export default function MatchListPage() {
                 <MatchCard
                 key={match.matchId}
                 profile={match.users[0]?.profile}
+                onMessage={() => router.push(`/messages/${match.matchId}`)}
                 onUnmatch={() => handleUnmatch(match.matchId)}
                 buttonLabel="Unmatch"
                 />

@@ -13,6 +13,7 @@ interface Profile {
 
 interface ProfileCardProps {
   profile?: Profile;
+  onMessage?: () => void;
   onUnmatch?: () => void;
   buttonLabel: string;
 }
@@ -20,6 +21,7 @@ interface ProfileCardProps {
 export default function ProfileCard({
   profile,
   onUnmatch,
+  onMessage,
   buttonLabel,
 }: ProfileCardProps) {
   if (!profile) return null;
@@ -49,11 +51,20 @@ export default function ProfileCard({
           {name}, {age}
         </h2>
         <p className="text-sm text-gray-500">{bio}</p>
-        <div className="card-actions mt-3">
+        <div className="card-actions flex gap-3 mt-3">
+          <button
+          onClick={onMessage}
+          disabled = {!onMessage}
+          className={`px-4 py-2 text-white rounded-full text-sm ${
+            onMessage ? "btn  bg-rose-600 hover:bg-rose-700" : "btn-disabled"
+          }`}
+        >
+          Message
+        </button>
           <button
             onClick={onUnmatch}
             disabled={!onUnmatch}
-            className={`btn btn-sm rounded-full ${
+            className={`px-4 py-2 btn text-sm rounded-full ${
               onUnmatch ? "btn-error" : "btn-disabled"
             }`}
           >
