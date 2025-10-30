@@ -21,13 +21,14 @@ export default function Navbar() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
+  // Close menus on route change
   useEffect(() => {
     setOpenMobile(false);
     setOpenProfile(false);
   }, [pathname]);
 
+  // Close dropdown on outside click
   useEffect(() => {
-    // Close dropdown when clicking outside
     const handleClick = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setOpenProfile(false);
@@ -37,6 +38,7 @@ export default function Navbar() {
     return () => window.removeEventListener("click", handleClick);
   }, []);
 
+  // Fetch profile
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -54,15 +56,15 @@ export default function Navbar() {
     })();
   }, []);
 
-  const initials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
+  const initials = (name?: string) =>
+    name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase()
+      : "U";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -71,21 +73,29 @@ export default function Navbar() {
 
   const NavLinks = () => (
     <>
-      <Link href="/home" className={`hover:text-rose-600 ${pathname === "/home" ? "text-rose-600 font-medium" : ""}`}>
-        Discover
-      </Link>
-      <Link href="/matchlist" className={`hover:text-rose-600 ${pathname === "/matchlist" ? "text-rose-600 font-medium" : ""}`}>
-        List
-      </Link>
-      <Link href="/messages" className={`hover:text-rose-600 ${pathname === "/messages" ? "text-rose-600 font-medium" : ""}`}>
-        Messages
-      </Link>
+      {[
+        { href: "/home", label: "Discover" },
+        { href: "/matchlist", label: "Matches" },
+        { href: "/messages", label: "Messages" },
+      ].map(({ href, label }) => (
+        <Link
+          key={href}
+          href={href}
+          className={`px-3 py-2 transition-all duration-200 rounded-md ${
+            pathname === href
+              ? "text-rose-600 font-semibold bg-rose-100"
+              : "text-gray-700 hover:text-rose-600 hover:bg-rose-50"
+          }`}
+        >
+          {label}
+        </Link>
+      ))}
     </>
   );
 
   return (
-    <nav className="bg-[#f3f3f3] border-b border-gray-200 px-4 md:px-10 py-5 flex items-center justify-between sticky top-0 z-50">
-       {/* Hamburger (visible on mobile) */}
+    <nav className="bg-white border-b border-gray-200 px-4 md:px-10 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        {/* MOBILE MENU ICON */}
         <button
           className="md:hidden text-gray-700"
           onClick={() => setOpenMobile((p) => !p)}
@@ -93,42 +103,40 @@ export default function Navbar() {
         >
           {openMobile ? <X size={24} /> : <Menu size={24} />}
         </button>
-
-      {/* CENTER: Logo */}
-      <div className="flex items-center gap-2">
-        <Link href="/home" className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-rose-600 text-white font-bold">
-            ♥
-          </span>
-          <span className="text-xl font-semibold text-gray-800">HeartLink</span>
-        </Link>
-      </div>
+      {/* LEFT: Logo */}
+      <Link href="/home" className="flex items-center gap-2">
+        <motion.span
+          className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-rose-600 text-white font-bold"
+          whileHover={{ scale: 1.1 }}
+        >
+          ♥
+        </motion.span>
+        <span className="text-xl font-semibold text-gray-800">HeartLink</span>
+      </Link>
 
       {/* DESKTOP NAV */}
-      <div className="hidden md:flex items-center gap-8 text-gray-600 text-md font-bold">
+      <div className="hidden md:flex items-center gap-4 text-sm font-medium">
         <NavLinks />
       </div>
 
-      {/* RIGHT SIDE: Profile + Hamburger */}
-      <div className="flex items-center gap-4">
-       
-
-        {/* Profile dropdown */}
-        <div className="relative" ref={profileRef}>
+      {/* RIGHT: Profile */}
+      <div className="relative flex items-center gap-3">
+        {/* Profile Dropdown */}
+        <div ref={profileRef}>
           <button
             onClick={() => setOpenProfile((p) => !p)}
-            className="flex items-center gap-2 px-3 py-1 rounded-full hover:shadow-sm"
+            className="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition"
           >
             {profile?.photoUrl ? (
               <Image
                 src={profile.photoUrl}
                 alt={profile.name || "User"}
-                className="w-20 h-20 rounded-full object-cover"
-                width={32}
-                height={32}
+                className="w-9 h-9 rounded-full object-cover border border-gray-300"
+                width={36}
+                height={36}
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
+              <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 border border-gray-300">
                 {initials(profile?.name)}
               </div>
             )}
@@ -141,18 +149,21 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden"
               >
-                <ul className="flex flex-col py-1">
+                <ul className="flex flex-col py-1 text-sm">
                   <li>
-                    <Link href="/profile/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link
+                      href="/profile/edit"
+                      className="block px-4 py-2 text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+                    >
                       Edit Profile
                     </Link>
                   </li>
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50"
                     >
                       Logout
                     </button>
@@ -162,9 +173,11 @@ export default function Navbar() {
             )}
           </AnimatePresence>
         </div>
+
+      
       </div>
 
-      {/* MOBILE NAV (slide down) */}
+      {/* MOBILE NAV */}
       <AnimatePresence>
         {openMobile && (
           <motion.div
@@ -172,7 +185,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-[60px] left-0 w-full bg-white border-t border-gray-200 shadow-md md:hidden flex flex-col items-center py-4 space-y-4 text-gray-700 text-sm z-40"
+            className="absolute top-[60px] left-0 w-full bg-white border-t border-gray-200 shadow-md md:hidden flex flex-col items-center py-4 space-y-3 text-gray-700 text-sm z-40"
           >
             <NavLinks />
           </motion.div>
