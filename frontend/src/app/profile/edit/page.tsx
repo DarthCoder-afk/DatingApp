@@ -193,8 +193,9 @@ export default function EditProfilePage() {
 
           <button
             type="submit"
+            disabled={loading}
             className={`btn btn-rose-600 w-full text-white bg-rose-600 hover:bg-rose-700 mt-4 `}
-          >Update Profile
+          >{loading ? "Updating..." : "Update Profile"}
            
           </button>
         </form>
