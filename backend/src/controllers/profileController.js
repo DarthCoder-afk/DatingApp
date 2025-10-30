@@ -1,4 +1,5 @@
 import prisma from "../../prisma/client.js";
+import { uploadToCloudinary } from "../config/cloudinary.js";
 
 export const getUserProfile = async (req, res) =>{
     try {
@@ -21,13 +22,12 @@ export const getUserProfile = async (req, res) =>{
 export const updateUserProfile = async (req, res) => {
   try {
     const { name, age, bio, gender } = req.body;
-    const file = req.file; // uploaded profile photo
-
+    
     let photoUrl;
 
-    if (file) {
-      // Upload to Cloudinary
-      photoUrl = await uploadToCloudinary(file.buffer, "datingapp_profiles");
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer, "datingApp_profiles");
+      photoUrl = result;
     }
 
     // Update profile
