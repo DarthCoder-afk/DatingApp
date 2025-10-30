@@ -39,4 +39,56 @@ export const getUserMatches = async (req, res) => {
         console.error("Error fetching matches:", error);
         res.status(500).json({ message: "Internal server error." });
     }
-}
+};
+
+/**
+ * Unmatch a user — deletes the match and related messages
+ */
+export const unmatchUser = async (req, res) => {
+  const { matchId } = req.params;
+
+  try {
+    await prisma.match.delete({
+      where: { id: parseInt(matchId) },
+    });
+
+    res.json({ message: "Unmatched successfully." });
+  } catch (error) {
+    console.error("Error unmatching user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/**
+ * Get likes overview — outgoing, incoming, and mutual likes
+ */
+export const getLikesOverview = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [likesGiven, likesReceived] = await Promise.all([
+      prisma.like.findMany({
+        where: { fromId: userId },
+        include: { to: { include: { profile: true } } },
+      }),
+      prisma.like.findMany({
+        where: { toId: userId },
+        include: { from: { include: { profile: true } } },
+      }),
+    ]);
+
+    // Find mutual likes
+    const mutualLikes = likesGiven.filter((given) =>
+      likesReceived.some((received) => received.fromId === given.toId)
+    );
+
+    res.json({
+      likesGiven,
+      likesReceived,
+      mutualLikes,
+    });
+  } catch (error) {
+    console.error("Error fetching likes overview:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

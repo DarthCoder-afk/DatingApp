@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import ProfileCard from "./ProfileCard";
+import toast from "react-hot-toast";
 
 interface SwipeCardProps {
   profile: any;
@@ -22,20 +23,32 @@ export default function SwipeCard({ profile, onLike, onPass }: SwipeCardProps) {
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.5}
       onDragEnd={(e, info) => {
-        if (info.offset.x > 100) onLike();
-        else if (info.offset.x < -100) onPass();
+        if (info.offset.x > 100) {
+            onLike();
+            toast.success("You have liked this person");
+        } else if (info.offset.x < -100) {
+            onPass()
+            toast.success("You have rejected this person");};
       }}
       className="absolute w-full"
     >
       <motion.div
         style={{ opacity: likeOpacity }}
-        className="absolute top-10 left-10 text-green-500 text-3xl font-bold z-10"
+        onClick={() => {
+          toast.success("You have liked this person");
+          onLike();
+        }}
+        className="absolute top-10 right-10 text-green-500 text-3xl font-bold z-10"
       >
         ❤️ LIKE
       </motion.div>
       <motion.div
         style={{ opacity: passOpacity }}
-        className="absolute top-10 right-10 text-red-500 text-3xl font-bold z-10"
+         onClick={() => {
+          toast.success("You have rejected this person");
+          onPass();
+        }}
+        className="absolute top-10 left-10 text-red-500 text-3xl font-bold z-10"
       >
         ❌ PASS
       </motion.div>

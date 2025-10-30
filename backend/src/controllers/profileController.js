@@ -66,7 +66,11 @@ export const getAllProfiles = async (req, res) => {
           some: { id: userId },
         },
       },
-      include: { users: true },
+     select: {
+        users: {
+          select: { id: true },
+        },
+      },
     });
 
     // Extract all matched user IDs
@@ -75,20 +79,28 @@ export const getAllProfiles = async (req, res) => {
     );
 
     // Create exclusion list
-    const excludeIds = [
-      userId,
-      ...likedUsers.map((l) => l.toId),
-      ...matchedIds,
-    ];
+    const excludeIds = Array.from(
+      new Set([
+        userId,
+        ...likedUsers.map((l) => l.toId),
+        ...matchedIds,
+      ])
+    );
 
     // Fetch remaining profiles
-    const profiles = await prisma.profile.findMany({
+   const profiles = await prisma.profile.findMany({
       where: {
         userId: { notIn: excludeIds },
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
       },
+      orderBy: { id: "asc" }, // optional, consistent ordering
     });
 
     res.json(profiles);

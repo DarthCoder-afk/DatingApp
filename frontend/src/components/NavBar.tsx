@@ -74,11 +74,8 @@ export default function Navbar() {
       <Link href="/home" className={`hover:text-rose-600 ${pathname === "/home" ? "text-rose-600 font-medium" : ""}`}>
         Discover
       </Link>
-      <Link href="/matches" className={`hover:text-rose-600 ${pathname === "/matches" ? "text-rose-600 font-medium" : ""}`}>
-        Matches
-      </Link>
       <Link href="/matchlist" className={`hover:text-rose-600 ${pathname === "/matchlist" ? "text-rose-600 font-medium" : ""}`}>
-        Matchlist
+        List
       </Link>
       <Link href="/messages" className={`hover:text-rose-600 ${pathname === "/messages" ? "text-rose-600 font-medium" : ""}`}>
         Messages
@@ -99,7 +96,7 @@ export default function Navbar() {
       </div>
 
       {/* DESKTOP NAV */}
-      <div className="hidden md:flex items-center gap-8 text-gray-600 text-sm">
+      <div className="hidden md:flex items-center gap-8 text-gray-600 text-md font-bold">
         <NavLinks />
       </div>
 

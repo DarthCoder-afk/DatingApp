@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface ProfileCardProps {
     profile: {
@@ -36,13 +37,19 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
         <p className="text-gray-600 text-sm mb-3">{profile.bio || "No bio available"}</p>
         <div className="flex gap-4">
             <button
-            onClick={onPass}
+            onClick={() => {
+                toast.success("You have rejected this person");
+                onPass();
+            }}
             className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full"
             >
             ❌ Pass
             </button>
             <button
-            onClick={onLike}
+            onClick={() => {
+                toast.success("You have liked this person");
+                onLike();
+            }}
             className="bg-rose-600 text-white hover:bg-rose-700 px-4 py-2 rounded-full"
             >
             ❤️ Like
