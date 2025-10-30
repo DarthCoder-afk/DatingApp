@@ -16,9 +16,10 @@ export default function RegisterPage() {
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
+
   const [success, setSuccess] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,8 +27,9 @@ export default function RegisterPage() {
 
  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+  
     setSuccess("");
+    setLoading(true);
 
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => data.append(key, value));
@@ -46,9 +48,11 @@ export default function RegisterPage() {
         toast.success("Registration successful!");
         localStorage.setItem("token", result.token);
         setTimeout(() => (window.location.href = "/home"), 1500);
-    } catch (err: any) {
-        setError(err.message);
-        toast.error(err.message);
+    } catch (err) {
+        console.error("Error message: ", err)
+        toast.error("Error");
+    } finally {
+      setLoading(false);
     }
 };
 
@@ -158,9 +162,10 @@ export default function RegisterPage() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 rounded-lg transition"
           >
-            Sign Up
+            {loading ? "Creating..." : "Create Account"}
           </button>
 
           <p className="text-center text-sm text-gray-500 mt-4">
