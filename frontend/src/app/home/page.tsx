@@ -1,0 +1,93 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import ProfileCard from "@/src/components/ProfileCard";
+import NavBar from "@/src/components/NavBar";
+import toast from "react-hot-toast";
+import SwipeCard from "@/src/components/SwipeCard";
+
+interface Profile {
+  id: number;
+  name: string;
+  age: number;
+  bio?: string;
+  photoUrl?: string | null;
+}
+
+export default function HomePage() {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profiles/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        setProfiles(data);
+      } catch (error: any) {
+        toast.error(error.message || "Failed to load profiles");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfiles();
+  }, []);
+
+  const handleLike = async (profileId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/likes/${profileId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      if (data.match) toast.success("It's a match!");
+
+      setCurrentIndex(prev => prev + 1);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to like profile");
+    }
+  };
+
+  const handlePass = () => setCurrentIndex(prev => prev + 1);
+
+  if (loading) return <p className="text-center text-gray-500 mt-10">Loading profiles...</p>;
+  if (currentIndex >= profiles.length)
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
+         <NavBar />
+        <div className=" flex flex-col items-center justify-center">
+              <p className="text-gray-600 text-xl mt-8">No more profiles to show.</p>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
+      <NavBar />
+      <div className="flex flex-col items-center">
+          <div className="relative w-full max-w-md mt-8 h-[500px]">
+                <AnimatePresence>
+                    {profiles.slice(currentIndex, currentIndex + 3).reverse().map((profile, index) => (
+                        <SwipeCard
+                        key={profile.id}
+                        profile={profile}
+                        onLike={() => handleLike(profile.id)}
+                        onPass={handlePass}
+                        />
+                    ))}
+                </AnimatePresence>
+                <p className="text-gray-500 mt-4">Swipe → to like, ← to pass</p>
+            </div>
+        </div>
+    </div>
+  );
+}

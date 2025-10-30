@@ -48,3 +48,52 @@ export const updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+export const getAllProfiles = async (req, res) => {
+   try {
+    const userId = req.user.id;
+
+    // Get IDs of users the current user already liked
+    const likedUsers = await prisma.like.findMany({
+      where: { fromId: userId },
+      select: { toId: true },
+    });
+
+    // Get IDs of users already matched
+    const matchedUsers = await prisma.match.findMany({
+      where: {
+        users: {
+          some: { id: userId },
+        },
+      },
+      include: { users: true },
+    });
+
+    // Extract all matched user IDs
+    const matchedIds = matchedUsers.flatMap((match) =>
+      match.users.map((u) => u.id)
+    );
+
+    // Create exclusion list
+    const excludeIds = [
+      userId,
+      ...likedUsers.map((l) => l.toId),
+      ...matchedIds,
+    ];
+
+    // Fetch remaining profiles
+    const profiles = await prisma.profile.findMany({
+      where: {
+        userId: { notIn: excludeIds },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    res.json(profiles);
+  } catch (error) {
+    console.error("Error fetching browse profiles:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
