@@ -30,8 +30,9 @@ export default function HomePage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setProfiles(data);
-      } catch (error: any) {
-        toast.error(error.message || "Failed to load profiles");
+      } catch (err) {
+        console.error("Error fetching profiles:", err);
+        toast.error("Failed to load profiles");
       } finally {
         setLoading(false);
       }
@@ -52,12 +53,28 @@ export default function HomePage() {
       if (data.match) toast.success("It's a match!");
 
       setCurrentIndex(prev => prev + 1);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to like profile");
+    } catch (err) {
+        console.error("Error liking user:", err);
+        toast.error("Failed to like profile");
     }
   };
 
-  const handlePass = () => setCurrentIndex(prev => prev + 1);
+  const handlePass = async (profileId: number) => {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/passes/${profileId}`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        setCurrentIndex((prev) => prev + 1);
+    } catch (err) {
+        console.error("Error passing user:", err);
+        toast.error("Failed to pass profile");
+        }
+    };
 
   if (loading) return <p className="text-center text-gray-500 mt-10">Loading profiles...</p>;
   if (currentIndex >= profiles.length)
@@ -81,7 +98,7 @@ export default function HomePage() {
                         key={profile.id}
                         profile={profile}
                         onLike={() => handleLike(profile.id)}
-                        onPass={handlePass}
+                        onPass={() => handlePass(profile.id)}
                         />
                     ))}
                 </AnimatePresence>

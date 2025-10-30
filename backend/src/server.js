@@ -30,7 +30,7 @@ app.use('/api/auths', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/likes', likeRoutes );
 app.use('/api/matches', matchRoutes);
-app.use('api/passes', passRoutes)
+app.use('/api/passes', passRoutes)
 
 
 setupSocket(server);

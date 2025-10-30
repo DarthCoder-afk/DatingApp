@@ -59,6 +59,12 @@ export const getAllProfiles = async (req, res) => {
       select: { toId: true },
     });
 
+    // Get IDs of users the current user already passed
+    const passedUsers = await prisma.pass.findMany({
+      where: { fromId: userId },
+      select: { toId: true },
+    });
+
     // Get IDs of users already matched
     const matchedUsers = await prisma.match.findMany({
       where: {
@@ -83,6 +89,7 @@ export const getAllProfiles = async (req, res) => {
       new Set([
         userId,
         ...likedUsers.map((l) => l.toId),
+        ...passedUsers.map((p) => p.toId),
         ...matchedIds,
       ])
     );
