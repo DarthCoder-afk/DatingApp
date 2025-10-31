@@ -26,6 +26,8 @@ app.use(cors({origin: [process.env.UI_SERVER]}));
 app.use(express.json());
 app.use(morgan('dev'));
 
+connectDb();
+
 
 app.use('/api/auths', authRoutes);
 app.use('/api/profiles', profileRoutes);
@@ -40,9 +42,6 @@ setupSocket(server);
 
 
 
-connectDb().then(() => {
-  server.listen(PORT, () => {
-    
-    console.log(`Server is running on port ${PORT}`);
-  });
-}); 
+server.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
