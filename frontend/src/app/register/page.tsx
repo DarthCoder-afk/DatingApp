@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { Eye, EyeOff, Upload } from "lucide-react"; // 👈 Icons
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -17,44 +18,62 @@ export default function RegisterPage() {
     password: "",
   });
 
-  const [success, setSuccess] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false); // 👈 For toggling visibility
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleRegister = async (e: React.FormEvent) => {
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setPhoto(file);
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    setSuccess("");
     setLoading(true);
+
+    // ✅ Password strength validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      toast.error(
+        "Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long."
+      );
+      setLoading(false);
+      return;
+    }
 
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => data.append(key, value));
     if (photo) data.append("photo", photo);
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auths/register`, 
-            {
-            method: "POST",
-            body: data,
-             });
-        const result = await res.json();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auths/register`, {
+        method: "POST",
+        body: data,
+      });
+      const result = await res.json();
 
-        if (!res.ok) throw new Error(result.message);
-        setSuccess("Registration successful!");
-        toast.success("Registration successful!");
-        localStorage.setItem("token", result.token);
-        setTimeout(() => (window.location.href = "/home"), 1500);
-    } catch (err) {
-        console.error("Error message: ", err)
-        toast.error("Error");
+      if (!res.ok) throw new Error(result.message);
+      toast.success("Registration successful!");
+      localStorage.setItem("token", result.token);
+      setTimeout(() => (window.location.href = "/home"), 1500);
+    } catch (err: any) {
+      console.error("Error message: ", err);
+      toast.error("Error: " + (err.message || "Something went wrong"));
     } finally {
       setLoading(false);
     }
-};
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -65,13 +84,14 @@ export default function RegisterPage() {
         transition={{ duration: 0.6 }}
         className="flex flex-col justify-center items-center w-full md:w-1/2 bg-white px-8 md:px-16 shadow-md"
       >
-        <h2 className="text-3xl font-bold text-center mb-2 text-gray-800">Create an Account</h2>
+        <h2 className="text-3xl font-bold text-center mb-2 text-gray-800">
+          Create an Account
+        </h2>
         <p className="text-gray-500 text-center mb-8">
           Join HeartLink and start connecting with amazing people today.
         </p>
 
         <form onSubmit={handleRegister} className="w-full max-w-sm space-y-5">
-         
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
             <input
@@ -137,27 +157,51 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div>
+          {/* Password Field with Show/Hide */}
+          <div className="relative">
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-rose-500 focus:outline-none"
               required
+              placeholder="At least 8 characters"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[34px] text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
+          {/* File Upload Field */}
           <div>
             <label className="block text-sm font-medium mb-1">Profile Photo</label>
-            <input
+            <div className="flex items-center gap-3 border border-gray-300 rounded-lg p-2">
+              <label
+                htmlFor="photo-upload"
+                className="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer transition"
+              >
+                <Upload size={16} />
+                Upload Photo
+              </label>
+              <input
+                id="photo-upload"
                 type="file"
                 name="photo"
                 accept="image/*"
-                onChange={(e) => setPhoto(e.target.files?.[0] || null)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none"
-            />
+                onChange={handlePhotoChange}
+                className="hidden"
+              />
+              <span className="text-gray-600 text-sm truncate">
+                {photo ? photo.name : "No file selected"}
+              </span>
+            </div>
+          
           </div>
 
           <button
