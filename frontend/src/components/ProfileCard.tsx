@@ -9,6 +9,7 @@ interface ProfileCardProps {
     id: number;
     name: string;
     age: number;
+    gender?: string;
     bio?: string;
     photoUrl?: string | null;
   };
@@ -17,6 +18,17 @@ interface ProfileCardProps {
 }
 
 export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProps) {
+    const getDefaultPhoto = () => {
+      if (profile.gender?.toLowerCase() === "male") {
+        return "/default/default-male.svg";
+      } else if (profile.gender?.toLowerCase() === "female") {
+        return "/default/default-female.svg";
+      } else {
+        return "/default/default_profile.svg"; // neutral or unknown
+      }
+    };
+
+    const imageUrl = profile.photoUrl || getDefaultPhoto();
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
@@ -27,7 +39,7 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
         <div className="avatar">
           <div className="w-50 rounded-full ring ring-rose-600 ring-offset-base-100 ring-offset-2">
             <Image
-              src={profile.photoUrl || "/default/default_profile.svg"}
+              src={imageUrl}
               alt={profile.name || "Profile Photo"}
               className="object-cover"
               width={128}
