@@ -7,8 +7,14 @@ dotenv.config();
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
-    cors: { origin: process.env.UI_SERVER, 
-      methods: ["GET", "POST"] },
+    cors: {
+      origin: [
+        "https://datingapp-heartlink.vercel.app",
+        "http://localhost:3000",
+      ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
   });
 
   // JWT authentication
