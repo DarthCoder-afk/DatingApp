@@ -1,10 +1,13 @@
 import { Server } from "socket.io";
 import prisma from "../../prisma/client.js";
 import { decodeToken } from "../config/jwt.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
-    cors: { origin: "*", 
+    cors: { origin: process.env.UI_SERVER, 
       methods: ["GET", "POST"] },
   });
 
@@ -23,7 +26,7 @@ export const setupSocket = (server) => {
 
     socket.on("joinRoom", async (matchId) => {
       const match = await prisma.match.findUnique({
-        where: { id: matchId },
+        where: { id: parseInt(matchId, 10) },
         include: { users: true },
       });
 
@@ -39,7 +42,7 @@ export const setupSocket = (server) => {
       const { matchId, content } = data;
 
       const match = await prisma.match.findUnique({
-        where: { id: matchId },
+        where: { id: parseInt(matchId, 10)},
         include: { users: true },
       });
 
@@ -49,7 +52,7 @@ export const setupSocket = (server) => {
       }
 
       const message = await prisma.message.create({
-        data: { matchId, senderId: socket.userId, content },
+        data: { matchId:Number(matchId), senderId: socket.userId, content },
         include: { sender: { include: { profile: true } } },
       });
 

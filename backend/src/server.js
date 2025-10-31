@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 
-app.use(cors({origin: ["http://localhost:3000"]}));
+app.use(cors({origin: [process.env.UI_SERVER]}));
 app.use(express.json());
 app.use(morgan('dev'));
 
