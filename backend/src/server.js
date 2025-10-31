@@ -22,10 +22,25 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 
-app.use(cors({
-    origin: process.env.UI_URL,
+const allowedOrigins = [
+  "https://datingapp-heartlink.vercel.app", // Vercel frontend
+  "http://localhost:3000"                   // Local dev (optional)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow server-to-server calls
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("CORS not allowed for this origin"), false);
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  }));
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 
