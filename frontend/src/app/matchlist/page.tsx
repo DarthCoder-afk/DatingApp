@@ -15,6 +15,7 @@ interface Profile {
   bio?: string;
   gender?: string;
   photoUrl?: string;
+  profile: Profile;
 }
 
 interface Like {
