@@ -63,7 +63,7 @@ Built with **Next.js**, **Express.js**, **Prisma**, and **PostgreSQL**, it empha
 
 ### Deployment  
 - **Frontend:** Vercel  
-- **Backend:** Render / Railway  
+- **Backend:** Railway  
 - **Database:** PostgreSQL  
 
 ---
@@ -102,7 +102,7 @@ frontend/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/heartlink.git
+   https://github.com/DarthCoder-afk/DatingApp.git
    cd heartlink
    ```
 
@@ -233,9 +233,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-Sean Michael A. Borje - 
+Sean Michael A. Borje - seanmichaelborje179@gmail.com
 
-Project Link: 
+
 
 ---
 
