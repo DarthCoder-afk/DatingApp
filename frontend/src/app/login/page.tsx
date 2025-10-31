@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { EyeOff, Eye } from "lucide-react";
 
 
 
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
 
 
@@ -60,20 +62,22 @@ export default function LoginPage() {
             />
           </div>
 
-          <div>
+         <div className="relative">
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"} // 👈 Toggle type
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none pr-10"
               required
             />
-            <div className="text-right mt-2">
-              <Link href="#" className="text-sm text-rose-600 hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // 👈 Toggle state
+              className="absolute right-3 top-[34px] text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
           <button
@@ -83,18 +87,6 @@ export default function LoginPage() {
             Log In
           </button>
 
-          <div className="text-center text-gray-500 text-sm my-3">or continue with</div>
-
-          <div className="flex gap-3 justify-center">
-            <button
-              type="button"
-              className="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-            >
-              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg" alt="Google" width={18} height={18} />
-              Google
-            </button>
-
-          </div>
 
           <p className="text-center text-sm text-gray-500 mt-4">
             Don’t have an account?{" "}
