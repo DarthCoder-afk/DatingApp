@@ -126,14 +126,14 @@ export default function ChatPage() {
     );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen ">
       <NavBar />
       <div className="flex flex-col h-screen bg-base-200">
         <div className="p-4 bg-rose-600 text-white text-lg font-semibold sticky top-0 z-10">
           Chat 💬
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-rose-50 to-pink-300">
           {messages.map((msg, idx) => {
             const isMine = msg.sender.id === userId;
             return (

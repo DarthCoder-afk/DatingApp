@@ -31,11 +31,11 @@ export default function ProfileCard({
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
-      className="card bg-[#f7eeed] shadow-xl hover:shadow-2xl transition-all"
+      className="card bg-[#f7eeed] shadow-xl hover:shadow-2xl transition-all border-t-8 border-rose-500"
     >
       <figure className="px-10 pt-10">
         <div className="avatar">
-          <div className="w-50 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+          <div className="w-50 rounded-full ring ring-rose-600 ring-offset-base-100 ring-offset-2">
             <Image
               src={imgSrc}
               alt={name}

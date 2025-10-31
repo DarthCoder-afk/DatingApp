@@ -20,7 +20,7 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
-      className="card card-compact bg-base-100 shadow-xl transition-all min-h-120"
+      className="card card-compact bg-base-100 transition-all border-t-8 border-rose-500  min-h-120"
     >
       {/* Profile Image */}
       <figure className="px-10 pt-10">

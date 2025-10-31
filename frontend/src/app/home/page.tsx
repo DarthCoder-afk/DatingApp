@@ -116,7 +116,7 @@ export default function HomePage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-300">
       <NavBar />
 
       {/* Filter Section */}
@@ -151,7 +151,7 @@ export default function HomePage() {
                   className="h-2 w-full rounded-full bg-gray-300 relative"
                 >
                   <div
-                    className="absolute h-2 rounded-full bg-rose-500"
+                    className="absolute h-2 rounded-full bg-rose-400"
                     style={{
                       left: `${((ageRange[0] - MIN_AGE) / (MAX_AGE - MIN_AGE)) * 100}%`,
                       width: `${((ageRange[1] - ageRange[0]) / (MAX_AGE - MIN_AGE)) * 100}%`,
