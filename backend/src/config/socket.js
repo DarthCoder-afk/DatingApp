@@ -4,7 +4,8 @@ import { decodeToken } from "../config/jwt.js";
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] },
+    cors: { origin: "*", 
+      methods: ["GET", "POST"] },
   });
 
   // JWT authentication

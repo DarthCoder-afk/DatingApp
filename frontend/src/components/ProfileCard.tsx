@@ -27,7 +27,7 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
         <div className="avatar">
           <div className="w-50 rounded-full ring ring-rose-600 ring-offset-base-100 ring-offset-2">
             <Image
-              src={profile.photoUrl || "/default-profile.svg"}
+              src={profile.photoUrl || "/default/default_profile.svg"}
               alt={profile.name || "Profile Photo"}
               className="object-cover"
               width={128}

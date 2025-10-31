@@ -51,7 +51,7 @@ export default function HomePage() {
 
       if (data.match) toast.success("It's a match!");
 
-      setCurrentIndex(prev => prev + 1);
+      setProfiles(prev => prev.filter(profile => profile.id !== profileId));
     } catch (err) {
         console.error("Error liking user:", err);
         toast.error("Failed to like profile");
@@ -68,7 +68,7 @@ export default function HomePage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
 
-        setCurrentIndex((prev) => prev + 1);
+        setProfiles(prev => prev.filter(profile => profile.id !== profileId));
     } catch (err) {
         console.error("Error passing user:", err);
         toast.error("Failed to pass profile");
@@ -90,30 +90,29 @@ export default function HomePage() {
    <div className="min-h-screen bg-gradient-to-br from-rose-100 to-pink-400">
       <NavBar />
       <div className="flex flex-col items-center justify-center py-10 px-4">
-        {/* Mobile view: swipe stack */}
-        <div className="w-full max-w-sm h-[500px] relative md:hidden">
-          <AnimatePresence>
-            {profiles.slice(currentIndex, currentIndex + 3).reverse().map((profile) => (
-              <SwipeCard
-                key={profile.id}
-                profile={profile}
-                onLike={() => handleLike(profile.id)}
-                onPass={() => handlePass(profile.id)}
-              />
-            ))}
-          </AnimatePresence>
-          <p className="text-gray-500 mt-4 text-center">Swipe → to like, ← to pass</p>
-        </div>
+          {/* Mobile view: swipe stack */}
+          <div className="w-full max-w-sm h-[500px] relative md:hidden">
+            <AnimatePresence>
+              {profiles.slice(currentIndex, currentIndex + 3).reverse().map((profile) => (
+                <SwipeCard
+                  key={profile.id}
+                  profile={profile}
+                  onLike={() => handleLike(profile.id)}
+                  onPass={() => handlePass(profile.id)}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
 
-        {/* Desktop view: grid */}
-        <div className="hidden md:grid md:grid-cols-3 md:gap-6 w-full max-w-5xl">
-          {profiles.map((profile) => (
-            <div key={profile.id} className="relative">
-              <SwipeCard profile={profile} onLike={() => handleLike(profile.id)} onPass={() => handlePass(profile.id)} />
-            </div>
-          ))}
-        </div>
-  </div>
+          {/* Desktop view: grid */}
+          <div className="hidden md:grid md:grid-cols-4 md:gap-9 w-full max-w-5xl">
+            {profiles.map((profile) => (
+              <div key={profile.id} className="relative">
+                <SwipeCard profile={profile} onLike={() => handleLike(profile.id)} onPass={() => handlePass(profile.id)} />
+              </div>
+            ))}
+          </div>
+    </div>
   </div>
   );
 }

@@ -35,7 +35,7 @@ export default function ChatPage() {
       try {
         if(!matchId) return;
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/${matchId}`, {
-            
+
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -57,7 +57,8 @@ export default function ChatPage() {
     socket.connect();
     socket.emit("joinMatch", matchId);
 
-    socket.on("receiveMessage", (message: Message) => {
+   socket.on("receiveMessage", (message: Message) => {
+      console.log("📩 New message received:", message);
       setMessages((prev) => [...prev, message]);
     });
 
