@@ -24,6 +24,7 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -31,11 +32,13 @@ export default function ChatPage() {
 
   // ✅ Initialize socket after token is ready
   useEffect(() => {
-    if (!token) return;
+    if (!token || socketRef.current) return;
     const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
       auth: { token },
       transports: ["websocket"],
     });
+
+    socketRef.current = newSocket;
 
     newSocket.on("connect", () => console.log("✅ Connected to socket server"));
     newSocket.on("connect_error", (err) =>
@@ -69,18 +72,22 @@ export default function ChatPage() {
     fetchMessages();
   }, [matchId, token]);
 
-  // ✅ Join room and listen to messages
+  // Join room and listen to messages
   useEffect(() => {
     if (!socket || !matchId || !userId) return;
 
     socket.emit("joinRoom", matchId);
-    socket.on("receiveMessage", (message: Message) => {
+
+    const handleReceive = (message: Message) => {
       console.log("📩 New message received:", message);
       setMessages((prev) => [...prev, message]);
-    });
+    };
+
+    socket.off("receiveMessage", handleReceive); // ✅ prevent duplicates
+    socket.on("receiveMessage", handleReceive);
 
     return () => {
-      socket.off("receiveMessage");
+      socket.off("receiveMessage", handleReceive); // ✅ clean up
     };
   }, [socket, matchId, userId]);
 
@@ -91,32 +98,32 @@ export default function ChatPage() {
 
   // Send message
   const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !token) return;
+  e.preventDefault();
+  if (!newMessage.trim() || !token) return;
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/messages/${matchId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ content: newMessage }),
-        }
-      );
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/messages/${matchId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: newMessage }),
+      }
+    );
 
-      const savedMessage = await res.json();
-      if (!res.ok) throw new Error(savedMessage.message);
+    const savedMessage = await res.json();
+    if (!res.ok) throw new Error(savedMessage.message);
 
-      socket?.emit("sendMessage", { matchId, content: newMessage });
-      setMessages((prev) => [...prev, savedMessage]);
-      setNewMessage("");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send message");
-    }
-  };
+    // ✅ Only emit — don’t append manually
+    socket?.emit("sendMessage", { matchId, content: newMessage });
+    setNewMessage("");
+  } catch (err: any) {
+    toast.error(err.message || "Failed to send message");
+  }
+};
 
   if (loading)
     return (
