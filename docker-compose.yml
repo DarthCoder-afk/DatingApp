@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: heartlink
+      POSTGRES_PASSWORD: heartlink   # OK for local-only dev DB
+      POSTGRES_DB: heartlink
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env    # secrets live here, already gitignored
+    environment:
+      PORT: 5000
+      DATABASE_URL: postgresql://heartlink:heartlink@postgres:5432/heartlink
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
