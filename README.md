@@ -3,7 +3,6 @@
 **Developer:** Sean Michael A. Borje
 
 **Live app:** [datingapp-heartlink.vercel.app](https://datingapp-heartlink.vercel.app)  
-**API:** [heartlink-api-xhev.onrender.com](https://heartlink-api-xhev.onrender.com)
 
 ---
 
