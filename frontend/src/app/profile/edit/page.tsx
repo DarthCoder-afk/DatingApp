@@ -5,6 +5,8 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import Navbar from "@/src/components/NavBar";
+import { ArrowLeft, Camera, CheckCircle2, Save, UserRound } from "lucide-react";
+import MobileBottomNav from "@/src/components/MobileBottomNav";
 
 interface Profile {
   name: string;
@@ -28,6 +30,9 @@ export default function EditProfilePage() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(profile.name || "HeartLink member")}&backgroundColor=ffe4e6`;
+  const avatarUrl = preview || profile.photoUrl || dicebearUrl;
+  const useNextImage = Boolean(!preview && profile.photoUrl && !profile.photoUrl.startsWith("https://api.dicebear.com/"));
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -90,84 +95,62 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 bg-gradient-to-br from-rose-50 to-pink-300">
-      <Navbar/>
-      {/* Left Column */}
-      <div className="flex flex-col md:flex-row justify-center p-8">
-        <div className="bg-white rounded-lg shadow-md p-6 w-full md:w-1/3 flex flex-col items-center">
-        <div className="avatar mb-4">
-          <div className="w-40 rounded-full ring ring-rose-500 ring-offset-base-100 ring-offset-2">
-            <Image
-              src={preview || profile.photoUrl || "/default/default_profile.svg"}
-              alt="Profile"
-              width={160}
-              height={160}
-              className="rounded-full"
-            />
-          </div>
-        </div>
+    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
+      <div className="hidden md:block"><Navbar/></div>
+      <main className="mx-auto max-w-5xl px-5 pb-24 pt-6 md:px-10 md:py-12">
+        <header className="mb-6 flex items-center justify-between md:hidden"><Link href="/home" aria-label="Back to discover" className="text-rose-500"><ArrowLeft size={21} /></Link><h1 className="text-xl font-semibold text-slate-900">Edit profile</h1><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><UserRound size={18} /></span></header>
+        <div className="mb-8 hidden md:block"><Link href="/home" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-rose-600"><ArrowLeft size={16} /> Back to discover</Link><p className="mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-rose-500">Profile settings</p><h1 className="mt-2 text-3xl font-bold text-gray-900 md:text-4xl">Make your profile feel like you.</h1><p className="mt-3 max-w-2xl text-gray-600">Keep your details current so new connections can get to know the real you.</p></div>
+        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+          <aside className="h-fit rounded-3xl border border-rose-100 bg-white p-6 shadow-lg shadow-rose-100/60">
+            <div className="relative mx-auto h-44 w-44 overflow-hidden rounded-3xl bg-rose-50 ring-4 ring-rose-100 ring-offset-4 ring-offset-white">
+              {useNextImage ? <Image src={avatarUrl} alt="Profile" fill sizes="176px" className="object-cover" /> : <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />}
+            </div>
+            <div className="mt-6 text-center"><h2 className="text-xl font-bold text-gray-900">{profile.name || "Your profile"}{profile.age ? `, ${profile.age}` : ""}</h2><p className="mt-1 text-sm capitalize text-gray-500">{profile.gender || "Add your details"}</p></div>
+            <div className="my-6 h-px bg-rose-100" />
+            <label htmlFor="profile-photo" className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100"><Camera size={17} /> Change photo</label>
+            <input id="profile-photo" type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            <p className="mt-3 text-center text-xs leading-5 text-gray-500">Choose a clear photo that shows your face. JPG, PNG, or WEBP work best.</p>
+            {photo && <p className="mt-4 truncate rounded-lg bg-emerald-50 px-3 py-2 text-center text-xs font-medium text-emerald-700"><CheckCircle2 className="mr-1 inline" size={14} /> {photo.name}</p>}
+          </aside>
 
-        <h2 className="text-lg font-bold text-center">
-          {profile.name.toUpperCase()}, {profile.age}
-        </h2>
-        <p className="text-gray-500 mt-1">
-          {profile.gender ? profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) : ""}
-        </p>
+          <section className="rounded-3xl border border-rose-100 bg-white p-6 shadow-lg shadow-rose-100/60 md:p-8">
+            <div className="mb-7 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-600"><UserRound size={20} /></div><div><h2 className="font-bold text-gray-900">About you</h2><p className="text-sm text-gray-500">These details appear on your profile.</p></div></div>
 
-        <div className="divider"></div>
-
-        <label className="font-medium mb-1">Update Photo</label>
-        <input
-          type="file"
-          accept="image/*"
-          className="file-input file-input-bordered file-input-rose-600 w-full mb-4"
-          onChange={handlePhotoChange}
-        />
-
-        <Link href="/home" className="btn btn-outline w-full mt-auto">
-          Go back
-        </Link>
-      </div>
-
-      {/* Right Column */}
-      <div className="bg-white rounded-lg shadow-md p-8 w-full md:w-2/3 md:ml-6 mt-6 md:mt-0">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-700">Edit Profile</h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name */}
-          <div className="form-control">
-            <label className="label font-medium">Name</label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="profile-name" className="mb-2 block text-sm font-semibold text-gray-700">Name</label>
             <input
+              id="profile-name"
               type="text"
               value={profile.name}
               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              className="input input-bordered w-full"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
               required
             />
           </div>
 
-          {/* Bio */}
-          <div className="form-control">
-            <label className="label font-medium">Description</label>
+          <div>
+            <label htmlFor="profile-bio" className="mb-2 block text-sm font-semibold text-gray-700">Bio <span className="font-normal text-gray-400">(optional)</span></label>
             <textarea
+              id="profile-bio"
               value={profile.bio}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              className="textarea textarea-bordered w-full"
-              rows={3}
+              className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+              rows={5}
               placeholder="Write a short description about yourself..."
             ></textarea>
           </div>
 
-          {/* Gender + Age */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="form-control flex-1">
-              <label className="label font-medium">Gender</label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="profile-gender" className="mb-2 block text-sm font-semibold text-gray-700">Gender</label>
               <select
+                id="profile-gender"
                 value={profile.gender}
                 onChange={(e) =>
                   setProfile({ ...profile, gender: e.target.value })
                 }
-                className="select select-bordered w-full"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
               >
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
@@ -176,15 +159,16 @@ export default function EditProfilePage() {
               </select>
             </div>
 
-            <div className="form-control flex-1">
-              <label className="label font-medium">Age</label>
+            <div>
+              <label htmlFor="profile-age" className="mb-2 block text-sm font-semibold text-gray-700">Age</label>
               <input
+                id="profile-age"
                 type="number"
                 value={profile.age}
                 onChange={(e) =>
                   setProfile({ ...profile, age: parseInt(e.target.value) })
                 }
-                className="input input-bordered w-full"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
                 min={18}
                 required
               />
@@ -194,14 +178,14 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={loading}
-            className={`btn btn-rose-600 w-full text-white bg-rose-600 hover:bg-rose-700 mt-4 `}
-          >{loading ? "Updating..." : "Update Profile"}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 font-semibold text-white shadow-lg shadow-rose-200 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-70"
+          >{loading ? "Saving changes..." : <><Save size={18} /> Save changes</>}
            
           </button>
         </form>
-      </div>
-
-      </div>
+          </section>
+        </div>
+      </main><MobileBottomNav />
       
     </div>
   );
