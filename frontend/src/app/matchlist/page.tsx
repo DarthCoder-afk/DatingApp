@@ -7,7 +7,8 @@ import toast from "react-hot-toast";
 import Navbar from "@/src/components/NavBar";
 import MatchCard from "@/src/components/MatchCard";
 import { useRouter } from "next/navigation";
-import { Heart, Inbox, Send, Sparkles } from "lucide-react";
+import { Bell, Heart, Inbox, Send, Sparkles } from "lucide-react";
+import MobileBottomNav from "@/src/components/MobileBottomNav";
 
 interface Profile {
   id: number;
@@ -105,9 +106,10 @@ export default function MatchListPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
-        <Navbar />
-      <main className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">
-      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8 rounded-3xl bg-gradient-to-br from-rose-600 to-pink-500 px-6 py-8 text-white shadow-xl shadow-rose-200 md:px-10">
+        <div className="hidden md:block"><Navbar /></div>
+      <main className="mx-auto max-w-6xl px-5 pb-24 pt-6 md:px-10 md:py-12">
+      <header className="mb-6 flex items-center justify-between md:hidden"><button aria-label="Notifications" className="text-rose-500"><Bell size={20} /></button><h1 className="text-xl font-semibold text-slate-900">Matches</h1><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><Heart size={18} fill="currentColor" /></span></header>
+      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 hidden rounded-3xl bg-gradient-to-br from-rose-600 to-pink-500 px-6 py-8 text-white shadow-xl shadow-rose-200 md:block md:px-10">
         <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium"><Sparkles size={15} /> Your connections</p>
         <div className="mt-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><h1 className="text-3xl font-bold md:text-4xl">The people who felt the spark.</h1><p className="mt-3 max-w-2xl text-rose-50">See who you&apos;ve connected with, revisit likes, and turn a mutual match into a conversation.</p></div><div className="rounded-2xl bg-white/15 px-4 py-3"><p className="text-xs text-rose-100">Mutual matches</p><p className="text-2xl font-bold">{mutualLikes.length}</p></div></div>
       </motion.section>
@@ -168,6 +170,7 @@ export default function MatchListPage() {
       </motion.div>
       {((tab === "mutual" && !mutualLikes.length) || (tab === "given" && !likesGiven.length) || (tab === "received" && !likesReceived.length)) && <div className="rounded-3xl border border-dashed border-rose-200 bg-white/70 px-6 py-14 text-center"><Heart className="mx-auto text-rose-300" size={34} /><h2 className="mt-4 text-xl font-bold text-gray-900">Nothing here just yet</h2><p className="mt-2 text-sm text-gray-600">Keep exploring profiles—new connections begin with a small hello.</p></div>}
       </main>
+      <MobileBottomNav />
     </div>
   );
 }
