@@ -8,9 +8,10 @@ interface SwipeCardProps {
   profile: any;
   onLike: () => void;
   onPass: () => void;
+  stacked?: boolean;
 }
 
-export default function SwipeCard({ profile, onLike, onPass }: SwipeCardProps) {
+export default function SwipeCard({ profile, onLike, onPass, stacked = false }: SwipeCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const likeOpacity = useTransform(x, [50, 200], [0, 1]);
@@ -18,8 +19,8 @@ export default function SwipeCard({ profile, onLike, onPass }: SwipeCardProps) {
 
   return (
     <motion.div
-      style={{ x, rotate }}
-      drag="x"
+      style={stacked ? { x, rotate } : undefined}
+      drag={stacked ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.5}
       onDragEnd={(e, info) => {
@@ -30,28 +31,12 @@ export default function SwipeCard({ profile, onLike, onPass }: SwipeCardProps) {
             onPass()
             toast.success("You have rejected this person");};
       }}
-      className="absolute w-full"
+      className={stacked ? "absolute w-full" : "w-full"}
     >
-      <motion.div
-        style={{ opacity: likeOpacity }}
-        onClick={() => {
-          toast.success("You have liked this person");
-          onLike();
-        }}
-        className="absolute top-10 right-10 text-green-500 text-3xl font-bold z-10"
-      >
-        ❤️ LIKE
-      </motion.div>
-      <motion.div
-        style={{ opacity: passOpacity }}
-         onClick={() => {
-          toast.success("You have rejected this person");
-          onPass();
-        }}
-        className="absolute top-10 left-10 text-red-500 text-3xl font-bold z-10"
-      >
-        ❌ PASS
-      </motion.div>
+      {stacked && <>
+        <motion.div style={{ opacity: likeOpacity }} className="absolute right-5 top-7 z-10 rotate-12 rounded-lg border-2 border-emerald-500 px-3 py-1 text-xl font-bold text-emerald-600">LIKE</motion.div>
+        <motion.div style={{ opacity: passOpacity }} className="absolute left-5 top-7 z-10 -rotate-12 rounded-lg border-2 border-rose-500 px-3 py-1 text-xl font-bold text-rose-600">PASS</motion.div>
+      </>}
 
       <ProfileCard profile={profile} onLike={onLike} onPass={onPass} />
     </motion.div>
