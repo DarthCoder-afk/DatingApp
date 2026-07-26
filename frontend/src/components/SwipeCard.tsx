@@ -9,9 +9,11 @@ interface SwipeCardProps {
   onLike: () => void;
   onPass: () => void;
   stacked?: boolean;
+  stackIndex?: number;
+  hideActions?: boolean;
 }
 
-export default function SwipeCard({ profile, onLike, onPass, stacked = false }: SwipeCardProps) {
+export default function SwipeCard({ profile, onLike, onPass, stacked = false, stackIndex = 0, hideActions = false }: SwipeCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const likeOpacity = useTransform(x, [50, 200], [0, 1]);
@@ -19,7 +21,7 @@ export default function SwipeCard({ profile, onLike, onPass, stacked = false }: 
 
   return (
     <motion.div
-      style={stacked ? { x, rotate } : undefined}
+      style={stacked ? { x, rotate, y: (2 - stackIndex) * 10, scale: 1 - (2 - stackIndex) * 0.035 } : undefined}
       drag={stacked ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.5}
@@ -38,7 +40,7 @@ export default function SwipeCard({ profile, onLike, onPass, stacked = false }: 
         <motion.div style={{ opacity: passOpacity }} className="absolute left-5 top-7 z-10 -rotate-12 rounded-lg border-2 border-rose-500 px-3 py-1 text-xl font-bold text-rose-600">PASS</motion.div>
       </>}
 
-      <ProfileCard profile={profile} onLike={onLike} onPass={onPass} />
+      <ProfileCard profile={profile} onLike={onLike} onPass={onPass} hideActions={hideActions} />
     </motion.div>
   );
 }
