@@ -77,11 +77,10 @@ export default function Navbar() {
         { href: "/home", label: "Discover", icon: Compass },
         { href: "/matchlist", label: "Matches", icon: Heart },
         { href: "/messages", label: "Messages", icon: MessageCircle },
-      ].map(({ href, label, icon: Icon, onClick }) => (
+      ].map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}
-          onClick={onClick}
           className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200 ${
             pathname === href
               ? "bg-rose-100 text-rose-700 font-semibold"
@@ -130,13 +129,10 @@ export default function Navbar() {
             className="flex items-center gap-2 rounded-2xl border border-transparent px-2 py-1.5 transition hover:border-rose-100 hover:bg-rose-50"
           >
             {profile?.photoUrl ? (
-              <Image
-                src={profile.photoUrl}
-                alt={profile.name || "User"}
-                className="h-9 w-9 rounded-xl border border-rose-200 object-cover"
-                width={36}
-                height={36}
-              />
+              profile.photoUrl.startsWith("https://api.dicebear.com/") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.photoUrl} alt={profile.name || "User"} className="h-9 w-9 rounded-xl border border-rose-200 object-cover" />
+              ) : <Image src={profile.photoUrl} alt={profile.name || "User"} className="h-9 w-9 rounded-xl border border-rose-200 object-cover" width={36} height={36} />
             ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-rose-100 text-sm font-bold text-rose-700">
                 {initials(profile?.name)}
