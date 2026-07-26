@@ -16,11 +16,13 @@ interface ProfileCardProps {
   };
   onLike: () => void;
   onPass: () => void;
+  hideActions?: boolean;
 }
 
-export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProps) {
+export default function ProfileCard({ profile, onLike, onPass, hideActions = false }: ProfileCardProps) {
   const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${profile.name}-${profile.id}`)}&backgroundColor=ffe4e6`;
-  const imageUrl = profile.photoUrl || dicebearUrl;
+  const hasUploadedPhoto = Boolean(profile.photoUrl && !profile.photoUrl.startsWith("https://api.dicebear.com/"));
+  const avatarUrl = profile.photoUrl || dicebearUrl;
 
   return (
     <motion.div
@@ -29,14 +31,13 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
       className="group overflow-hidden rounded-[1.75rem] border border-rose-100 bg-white shadow-lg shadow-rose-100/60"
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-rose-50">
-        <Image
-          src={imageUrl}
-          alt={`${profile.name}'s profile`}
-          fill
-          sizes="(min-width: 1280px) 280px, (min-width: 768px) 33vw, 100vw"
-          className="object-cover transition duration-500 group-hover:scale-[1.03]"
-          unoptimized={!profile.photoUrl}
-        />
+        {hasUploadedPhoto ? (
+          <Image src={avatarUrl} alt={`${profile.name}'s profile`} fill sizes="(min-width: 1280px) 280px, (min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.03]" />
+        ) : (
+          // DiceBear returns a generated SVG; loading it directly avoids Next image-host configuration at runtime.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt={`${profile.name}'s generated avatar`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+        )}
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-gray-950/75 via-gray-950/20 to-transparent" />
         {profile.gender && <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold capitalize text-gray-700 shadow-sm backdrop-blur"><UserRound size={13} /> {profile.gender}</span>}
         <div className="absolute inset-x-0 bottom-0 p-5 text-white">
@@ -45,7 +46,7 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-5 py-4">
+      {!hideActions && <div className="flex items-center justify-between px-5 py-4">
         <span className="text-xs font-medium text-gray-400">Choose an action</span>
         <div className="flex items-center gap-3">
           <motion.button
@@ -73,7 +74,7 @@ export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProp
             <Heart size={20} fill="currentColor" />
           </motion.button>
         </div>
-      </div>
+      </div>}
     </motion.div>
   );
 }
