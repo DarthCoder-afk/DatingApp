@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import NavBar from "@/src/components/NavBar";
+import { ArrowLeft, MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
 
 interface Message {
   id?: number;
@@ -19,6 +19,7 @@ interface Message {
 
 export default function ChatPage() {
   const { matchId } = useParams();
+  const router = useRouter();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -29,6 +30,7 @@ export default function ChatPage() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const userId = getUserIdFromToken(token);
+  const otherParticipant = messages.find((message) => message.sender.id !== userId)?.sender.profile;
 
   // ✅ Initialize socket after token is ready
   useEffect(() => {
@@ -127,78 +129,69 @@ export default function ChatPage() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <span className="loading loading-spinner text-rose-600"></span>
+      <div className="min-h-screen bg-rose-50"><NavBar /><div className="mx-auto max-w-5xl px-6 py-10"><div className="h-[calc(100vh-150px)] animate-pulse rounded-3xl bg-white" /></div>
       </div>
     );
 
   return (
-    <div className="min-h-screen ">
-      <NavBar />
-      <div className="flex flex-col h-screen bg-base-200">
-        <div className="p-4 bg-rose-600 text-white text-lg font-semibold sticky top-0 z-10">
-          Chat 💬
-        </div>
+    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
+      <div className="hidden md:block"><NavBar /></div>
+      <main className="mx-auto flex h-screen max-w-5xl flex-col md:h-[calc(100vh-72px)] md:px-8 md:py-6">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white md:rounded-3xl md:border md:border-rose-100 md:shadow-xl md:shadow-rose-100/60">
+          <header className="flex items-center justify-between border-b border-rose-100 bg-white px-5 py-4 md:px-6">
+            <div className="flex min-w-0 items-center gap-3">
+              <button onClick={() => router.push("/messages")} aria-label="Back to messages" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-500 transition hover:bg-rose-50 hover:text-rose-600"><ArrowLeft size={20} /></button>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600"><MessageCircle size={20} /></div>
+              <div className="min-w-0"><h1 className="truncate font-bold text-gray-900">{otherParticipant?.name || "Your conversation"}</h1><p className="text-xs text-gray-500">A space for a real connection</p></div>
+            </div>
+            <span className="hidden items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 sm:inline-flex"><Sparkles size={14} /> Matched</span>
+          </header>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-rose-50 to-pink-300">
+        <div className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,_rgba(251,113,133,0.12),_transparent_32%),linear-gradient(to_bottom,_#fff7f8,_#fff)] px-4 py-6 md:px-7">
+          {messages.length === 0 ? <div className="flex h-full flex-col items-center justify-center text-center"><div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-rose-100 text-rose-600"><MessageCircle size={26} /></div><h2 className="mt-5 text-xl font-bold text-gray-900">Start the conversation</h2><p className="mt-2 max-w-sm text-sm leading-6 text-gray-600">Try a thoughtful hello, a shared interest, or something that made you smile today.</p></div> : <div className="space-y-5">
           {messages.map((msg, idx) => {
             const isMine = msg.sender.id === userId;
+            const avatarUrl = msg.sender.profile.photoUrl || `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${msg.sender.profile.name}-${msg.sender.id}`)}&backgroundColor=ffe4e6`;
             return (
               <div
-                key={idx}
-                className={`chat ${isMine ? "chat-end" : "chat-start"}`}
+                key={msg.id ?? `${msg.createdAt}-${idx}`}
+                className={`flex items-end gap-2.5 ${isMine ? "justify-end" : "justify-start"}`}
               >
-                <div className="chat-image avatar">
-                  <div className="w-10 rounded-full">
-                    <Image
-                      src={
-                        msg.sender.profile.photoUrl ||
-                        "/default/default_profile.svg"
-                      }
-                      alt={msg.sender.profile.name}
-                      width={120}
-                      height={120}
-                    />
-                  </div>
-                </div>
-                <div
-                  className={`chat-bubble ${
-                    isMine ? "chat-bubble-primary" : "chat-bubble-secondary"
-                  }`}
-                >
-                  <span className="block text-xs opacity-70 mb-1">
-                    {isMine ? "You:" : `${msg.sender.profile.name}:`}
-                  </span>
-                  <p>{msg.content}</p>
-                </div>
-                <div className="chat-footer text-[10px] opacity-60 mt-1">
-                  {formatTimestamp(msg.createdAt)}
+                {!isMine && <img src={avatarUrl} alt={msg.sender.profile.name} className="h-9 w-9 shrink-0 self-end rounded-xl border border-rose-100 bg-rose-50 object-cover" />}
+                <div className={`max-w-[78%] md:max-w-[65%] ${isMine ? "items-end" : "items-start"}`}>
+                  {!isMine && <p className="mb-1 px-1 text-xs font-semibold text-gray-500">{msg.sender.profile.name}</p>}
+                  <div className={`rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${isMine ? "rounded-br-md bg-rose-600 text-white shadow-rose-200" : "rounded-bl-md border border-rose-100 bg-white text-gray-700"}`}><p className="break-words">{msg.content}</p></div>
+                  <p className={`mt-1 px-1 text-[11px] text-gray-400 ${isMine ? "text-right" : "text-left"}`}>{formatTimestamp(msg.createdAt)}</p>
                 </div>
               </div>
             );
           })}
-          <div ref={messagesEndRef}></div>
+          </div>}
+          <div ref={messagesEndRef} />
         </div>
 
         <form
           onSubmit={handleSend}
-          className="p-4 bg-base-100 border-t flex gap-2"
+          className="flex gap-3 border-t border-rose-100 bg-white p-4 md:p-5"
         >
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="input input-bordered w-full"
+            placeholder="Write a message..."
+            className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
           />
           <button
             type="submit"
-            className="btn btn-primary bg-rose-600 hover:bg-rose-700"
+            disabled={!newMessage.trim()}
+            aria-label="Send message"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-600 text-white shadow-lg shadow-rose-200 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Send
+            <SendHorizontal size={19} />
           </button>
         </form>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
