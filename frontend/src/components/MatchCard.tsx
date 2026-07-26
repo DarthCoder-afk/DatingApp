@@ -31,7 +31,8 @@ export default function ProfileCard({
  
   
     const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${name}-${profile.id || age}`)}&backgroundColor=ffe4e6`;
-    const imageUrl = profile.photoUrl || dicebearUrl;
+    const hasUploadedPhoto = Boolean(photoUrl && !photoUrl.startsWith("https://api.dicebear.com/"));
+    const avatarUrl = photoUrl || dicebearUrl;
 
   return (
     <motion.div
@@ -39,7 +40,12 @@ export default function ProfileCard({
       className="group overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-lg shadow-rose-100/60"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-rose-50">
-        <Image src={imageUrl} alt={name} fill sizes="(min-width: 1024px) 320px, 90vw" className="object-cover transition duration-500 group-hover:scale-[1.04]" unoptimized={!photoUrl} />
+        {hasUploadedPhoto ? (
+          <Image src={avatarUrl} alt={name} fill sizes="(min-width: 1024px) 320px, 90vw" className="object-cover transition duration-500 group-hover:scale-[1.04]" />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt={`${name}'s generated avatar`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
+        )}
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent" />
         {profile.gender && <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold capitalize text-gray-700"><UserRound size={13} /> {profile.gender}</span>}
       </div>

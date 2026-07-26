@@ -42,12 +42,12 @@ export const sendLike = async (req, res) => {
         });
 
         if (matchLike) {
-            await prisma.match.create({
+            const match = await prisma.match.create({
                data: {
                     users: { connect: [{ id: fromId }, { id: toId }] }
                 },
             });
-            return res.status(201).json({ message: "It's a match!", match: true, like: newLike });
+            return res.status(201).json({ message: "It's a match!", match: true, matchId: match.id, like: newLike });
         }
         res.status(201).json({ message: "Like sent successfully", like: newLike, match: false });
     } catch (error) {
