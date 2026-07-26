@@ -200,16 +200,16 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-8 flex flex-col gap-6 rounded-3xl bg-gradient-to-br from-rose-600 to-pink-500 px-6 py-8 text-white shadow-xl shadow-rose-200 md:flex-row md:items-end md:justify-between md:px-10"
+          className="mb-8 flex flex-col gap-6 border-b border-rose-100 pb-8 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium"><Sparkles size={15} /> Discover people</p>
-            <h1 className="text-3xl font-bold md:text-4xl">Find someone who shares your vibe.</h1>
-            <p className="mt-3 max-w-xl text-rose-50">Explore thoughtfully selected profiles and make the first move when it feels right.</p>
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-600"><Sparkles size={15} /> Discover people</p>
+            <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">Find someone who shares your vibe.</h1>
+            <p className="mt-3 max-w-xl text-gray-600">Explore thoughtfully selected profiles and make the first move when it feels right.</p>
           </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-2xl bg-rose-50 px-4 py-3 text-rose-600">
             <UsersRound size={22} />
-            <div><p className="text-xs text-rose-100">Profiles to explore</p><p className="text-xl font-bold">{filteredProfiles.length}</p></div>
+            <div><p className="text-xs text-rose-500">Profiles to explore</p><p className="text-xl font-bold">{filteredProfiles.length}</p></div>
           </div>
         </motion.section>
 

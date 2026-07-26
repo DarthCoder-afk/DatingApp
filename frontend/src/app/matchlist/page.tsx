@@ -109,13 +109,13 @@ export default function MatchListPage() {
         <div className="hidden md:block"><Navbar /></div>
       <main className="mx-auto max-w-6xl px-5 pb-24 pt-6 md:px-10 md:py-12">
       <header className="mb-6 flex items-center justify-between md:hidden"><button aria-label="Notifications" className="text-rose-500"><Bell size={20} /></button><h1 className="text-xl font-semibold text-slate-900">Matches</h1><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><Heart size={18} fill="currentColor" /></span></header>
-      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 hidden rounded-3xl bg-gradient-to-br from-rose-600 to-pink-500 px-6 py-8 text-white shadow-xl shadow-rose-200 md:block md:px-10">
-        <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium"><Sparkles size={15} /> Your connections</p>
-        <div className="mt-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><h1 className="text-3xl font-bold md:text-4xl">The people who felt the spark.</h1><p className="mt-3 max-w-2xl text-rose-50">See who you&apos;ve connected with, revisit likes, and turn a mutual match into a conversation.</p></div><div className="rounded-2xl bg-white/15 px-4 py-3"><p className="text-xs text-rose-100">Mutual matches</p><p className="text-2xl font-bold">{mutualLikes.length}</p></div></div>
+      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 hidden border-b border-rose-100 pb-8 md:block">
+        <p className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-600"><Sparkles size={15} /> Your connections</p>
+        <div className="mt-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><h1 className="text-3xl font-bold text-gray-900 md:text-4xl">The people who felt the spark.</h1><p className="mt-3 max-w-2xl text-gray-600">See who you&apos;ve connected with, revisit likes, and turn a mutual match into a conversation.</p></div><div className="rounded-2xl bg-rose-50 px-4 py-3 text-rose-600"><p className="text-xs text-rose-500">Mutual matches</p><p className="text-2xl font-bold">{mutualLikes.length}</p></div></div>
       </motion.section>
 
       {/* Tabs */}
-      <div className="mb-8 flex w-full gap-2 overflow-x-auto rounded-2xl border border-rose-100 bg-white p-2 shadow-sm">
+      <div className="mb-8 flex w-full gap-2 overflow-x-auto rounded-2xl border border-rose-100 bg-white p-2 shadow-sm md:justify-center">
         {[
           { key: "mutual", label: "Matches", icon: Heart, count: mutualLikes.length },
           { key: "given", label: "Liked", icon: Send, count: likesGiven.length },
