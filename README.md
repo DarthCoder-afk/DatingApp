@@ -162,12 +162,6 @@ CLOUD_API_KEY=your-key
 CLOUD_API_SECRET=your-secret
 ```
 
-**Frontend** (`frontend/.env.local`):
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
-```
-
 > Never commit `.env` or `.env.local` files. Use `.env.example` for placeholders only.
 
 ---
@@ -199,7 +193,7 @@ docker compose up --build
 
 Add `-d` to run in the background: `docker compose up --build -d`.
 
-Compose waits for PostgreSQL to become healthy, applies the Prisma schema, then starts the backend. The frontend is built with browser-facing URLs for the exposed backend at `http://localhost:5000`.
+Compose waits for PostgreSQL to become healthy, applies the Prisma schema, then starts the backend. The frontend is built with browser-facing URLs for the exposed backend at `http://localhost:5001`.
 
 You should see:
 ```
@@ -232,7 +226,7 @@ To run a service outside Docker instead, install its dependencies with `pnpm ins
 ```
 Browser (localhost:3000)
   → Frontend (Docker)
-  → Backend (Docker, localhost:5000)
+  → Backend (Docker, localhost:5001)
   → PostgreSQL (Docker)
   → Cloudinary (external)
 ```
@@ -242,7 +236,7 @@ Browser (localhost:3000)
 | Problem | Fix |
 |---------|-----|
 | Port `5432` already in use | Stop local Postgres or change the port mapping in `docker-compose.yml` |
-| Port `5000` already in use | Change to `"5001:5000"` in compose and update frontend env vars |
+| Port `5001` already in use | Change the backend port mapping and the frontend build arguments together in `docker-compose.yml` |
 | `Database connection failed` | Check `docker compose logs backend`; Compose applies the schema at backend startup |
 | Photo upload fails | Add valid Cloudinary keys to `backend/.env` and restart the backend |
 
