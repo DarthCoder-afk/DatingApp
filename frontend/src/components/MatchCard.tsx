@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { Heart, MessageCircle, UserRound } from "lucide-react";
 
 interface Profile {
   id?: number;
@@ -29,60 +30,24 @@ export default function ProfileCard({
   const { name, age, bio, photoUrl } = profile;
  
   
-    const getDefaultPhoto = () => {
-      if (profile.gender?.toLowerCase() === "male") {
-        return "/default/default-male.svg";
-      } else if (profile.gender?.toLowerCase() === "female") {
-        return "/default/default-female.svg";
-      } else {
-        return "/default/default_profile.svg"; // neutral or unknown
-      }
-    };
-
-    const imageUrl = profile.photoUrl || getDefaultPhoto();
+    const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${name}-${profile.id || age}`)}&backgroundColor=ffe4e6`;
+    const imageUrl = profile.photoUrl || dicebearUrl;
 
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="card bg-[#f7eeed] shadow-xl hover:shadow-2xl transition-all border-t-8 border-rose-500"
+      whileHover={{ y: -5 }}
+      className="group overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-lg shadow-rose-100/60"
     >
-      <figure className="px-10 pt-10">
-        <div className="avatar">
-          <div className="w-50 rounded-full ring ring-rose-600 ring-offset-base-100 ring-offset-2">
-            <Image
-              src={imageUrl}
-              alt={name}
-              width={120}
-              height={120}
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </figure>
-      <div className="card-body items-center text-center">
-        <h2 className="card-title text-lg font-semibold">
-          {name}, {age}
-        </h2>
-        <p className="text-sm text-gray-500">{bio}</p>
-        <div className="card-actions flex gap-3 mt-3">
-          <button
-          onClick={onMessage}
-          disabled = {!onMessage}
-          className={`px-4 py-2 text-white rounded-full text-sm ${
-            onMessage ? "btn  bg-rose-600 hover:bg-rose-700" : "btn-disabled"
-          }`}
-        >
-          Message
-        </button>
-          <button
-            onClick={onUnmatch}
-            disabled={!onUnmatch}
-            className={`px-4 py-2 btn text-sm rounded-full ${
-              onUnmatch ? "btn-error" : "btn-disabled"
-            }`}
-          >
-            {buttonLabel}
-          </button>
+      <div className="relative aspect-[4/3] overflow-hidden bg-rose-50">
+        <Image src={imageUrl} alt={name} fill sizes="(min-width: 1024px) 320px, 90vw" className="object-cover transition duration-500 group-hover:scale-[1.04]" unoptimized={!photoUrl} />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent" />
+        {profile.gender && <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold capitalize text-gray-700"><UserRound size={13} /> {profile.gender}</span>}
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3"><div><h2 className="text-xl font-bold text-gray-900">{name}, {age}</h2><p className="mt-1 line-clamp-2 min-h-10 text-sm leading-5 text-gray-600">{bio || "A new connection waiting to happen."}</p></div><Heart className="shrink-0 text-rose-500" size={20} fill="currentColor" /></div>
+        <div className="mt-5 flex gap-2">
+          {onMessage ? <button onClick={onMessage} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-sm font-semibold text-white shadow-md shadow-rose-200 transition hover:bg-rose-700"><MessageCircle size={16} /> Message</button> : <span className="flex flex-1 items-center justify-center rounded-xl bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-600">{buttonLabel}</span>}
+          {onUnmatch && <button onClick={onUnmatch} className="rounded-xl border border-rose-200 px-3 py-2.5 text-sm font-semibold text-rose-600 transition hover:bg-rose-50">Unmatch</button>}
         </div>
       </div>
     </motion.div>
