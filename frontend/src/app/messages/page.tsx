@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";    
 import NavBar from "@/src/components/NavBar";
+import { ArrowUpRight, MessageCircle, Sparkles } from "lucide-react";
 
 interface Conversation {
   matchId: number;
@@ -70,7 +71,7 @@ export default function MessagesPage() {
 
   if (!conversations.length)
     return (
-      <div className="flex flex-col justify-center items-center h-screen text-center">
+      <div className="min-h-screen bg-rose-50"><NavBar /><div className="flex min-h-[calc(100vh-72px)] flex-col items-center justify-center px-6 text-center">
         <Image
           src="/default/empty_chat.svg"
           alt="Empty"
@@ -84,40 +85,38 @@ export default function MessagesPage() {
         <p className="text-gray-500 mt-2 text-sm">
           Start matching to unlock your chat inbox.
         </p>
-      </div>
+      </div></div>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-300">
+    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
         <NavBar/>
-        <div className="py-6 px-4 md:px-10">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center md:text-left">
-                Messages 💌
-            </h1>
+        <main className="mx-auto max-w-4xl px-5 py-8 md:px-10 md:py-12">
+            <section className="mb-8 rounded-3xl bg-gradient-to-br from-rose-600 to-pink-500 px-6 py-8 text-white shadow-xl shadow-rose-200 md:px-10"><p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium"><Sparkles size={15} /> Your inbox</p><h1 className="mt-5 text-3xl font-bold md:text-4xl">Conversations worth continuing.</h1><p className="mt-3 text-rose-50">Your mutual matches, all in one calm place.</p></section>
 
-            <div className="bg-white shadow-md rounded-xl divide-y divide-gray-200 max-w-3xl mx-auto">
+            <div className="overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-lg shadow-rose-100/60">
                 {conversations.map((conv) => (
                 <button
                     key={conv.matchId}
                     onClick={() => router.push(`/messages/${conv.matchId}`)}
-                    className="w-full text-left flex items-center gap-4 p-4 hover:bg-rose-50 transition"
+                    className="group flex w-full items-center gap-4 border-b border-rose-50 p-5 text-left transition last:border-0 hover:bg-rose-50/70"
                 >
-                    <div className="avatar">
-                    <div className="w-14 h-14 rounded-full ring ring-rose-500 ring-offset-base-100 ring-offset-2">
+                    <div className="relative shrink-0">
+                    <div className="h-14 w-14 overflow-hidden rounded-2xl border border-rose-100 bg-rose-50">
                         <Image
                         src={conv.user.profile.photoUrl || "/default/default_profile.svg"}
                         alt={conv.user.profile.name}
                         width={120}
                         height={120}
-                        />
+                        className="h-full w-full object-cover" />
                     </div>
                     </div>
 
                     <div className="flex-1 overflow-hidden">
-                    <h3 className="font-semibold text-gray-800 truncate">
+                    <h3 className="truncate font-semibold text-gray-900">
                         {conv.user.profile.name}
                     </h3>
-                    <p className="text-gray-600 text-sm truncate">
+                    <p className="mt-1 truncate text-sm text-gray-500">
                         {conv.lastMessage
                         ? conv.lastMessage.sender.id === getUserIdFromToken(token)
                             ? `You: ${conv.lastMessage.content}`
@@ -126,15 +125,16 @@ export default function MessagesPage() {
                     </p>
                     </div>
 
-                    {conv.lastMessage && (
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                    {conv.lastMessage && <span className="whitespace-nowrap text-xs text-gray-400">
                         {formatTimestamp(conv.lastMessage.createdAt)}
-                    </span>
-                    )}
+                    </span>}
+                    <ArrowUpRight size={17} className="text-rose-300 transition group-hover:text-rose-600" />
+                    </div>
                 </button>
                 ))}
             </div>
-        </div>
+        </main>
     </div>
     
   );
