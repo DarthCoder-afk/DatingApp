@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Compass, Heart, LogOut, Menu, MessageCircle, Settings, X } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
@@ -98,20 +98,21 @@ export default function Navbar() {
   const NavLinks = () => (
     <>
       {[
-        { href: "/home", label: "Discover" },
-        { href: "/matchlist", label: "Matches" },
-        { href: "/messages", label: "Messages", onClick: handleMessagesClick },
-      ].map(({ href, label, onClick }) => (
+        { href: "/home", label: "Discover", icon: Compass },
+        { href: "/matchlist", label: "Matches", icon: Heart },
+        { href: "/messages", label: "Messages", icon: MessageCircle, onClick: handleMessagesClick },
+      ].map(({ href, label, icon: Icon, onClick }) => (
         <Link
           key={href}
           href={href}
           onClick={onClick}
-          className={`px-3 py-2 transition-all duration-200 rounded-md ${
+          className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200 ${
             pathname === href
-              ? "text-rose-600 font-semibold bg-rose-100"
-              : "text-gray-700 hover:text-rose-600 hover:bg-rose-50"
+              ? "bg-rose-100 text-rose-700 font-semibold"
+              : "text-gray-600 hover:bg-rose-50 hover:text-rose-600"
           }`}
         >
+          <Icon size={16} strokeWidth={pathname === href ? 2.5 : 2} />
           {label}
         </Link>
       ))}
@@ -119,28 +120,28 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 md:px-10 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-rose-100/80 bg-white/90 px-4 py-3 shadow-sm shadow-rose-100/60 backdrop-blur-xl md:px-10">
         {/* MOBILE MENU ICON */}
         <button
-          className="md:hidden text-gray-700"
+          className="rounded-xl p-2 text-gray-700 transition hover:bg-rose-50 hover:text-rose-600 md:hidden"
           onClick={() => setOpenMobile((p) => !p)}
           aria-label="Toggle menu"
         >
           {openMobile ? <X size={24} /> : <Menu size={24} />}
         </button>
       {/* LEFT: Logo */}
-      <Link href="/home" className="flex items-center gap-2">
+      <Link href="/home" className="flex items-center gap-2.5">
         <motion.span
-          className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-rose-600 text-white font-bold"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-200"
           whileHover={{ scale: 1.1 }}
         >
-          ♥
+          <Heart size={20} fill="currentColor" />
         </motion.span>
-        <span className="text-xl font-semibold text-gray-800">HeartLink</span>
+        <span className="text-xl font-bold tracking-tight text-gray-900">HeartLink</span>
       </Link>
 
       {/* DESKTOP NAV */}
-      <div className="hidden md:flex items-center gap-4 text-sm font-medium">
+      <div className="hidden items-center gap-1 rounded-2xl border border-rose-100 bg-white/80 p-1 text-sm font-medium shadow-sm md:flex">
         <NavLinks />
       </div>
 
@@ -150,21 +151,23 @@ export default function Navbar() {
         <div ref={profileRef}>
           <button
             onClick={() => setOpenProfile((p) => !p)}
-            className="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition"
+            className="flex items-center gap-2 rounded-2xl border border-transparent px-2 py-1.5 transition hover:border-rose-100 hover:bg-rose-50"
           >
             {profile?.photoUrl ? (
               <Image
                 src={profile.photoUrl}
                 alt={profile.name || "User"}
-                className="w-9 h-9 rounded-full object-cover border border-gray-300"
+                className="h-9 w-9 rounded-xl border border-rose-200 object-cover"
                 width={36}
                 height={36}
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 border border-gray-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-rose-100 text-sm font-bold text-rose-700">
                 {initials(profile?.name)}
               </div>
             )}
+            <span className="hidden max-w-28 truncate text-sm font-semibold text-gray-700 lg:block">{profile?.name || "My profile"}</span>
+            <ChevronDown size={16} className={`hidden text-gray-400 transition lg:block ${openProfile ? "rotate-180" : ""}`} />
           </button>
 
           <AnimatePresence>
@@ -174,23 +177,27 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden"
+                className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-rose-100 bg-white p-2 shadow-xl shadow-rose-200/60 z-50"
               >
-                <ul className="flex flex-col py-1 text-sm">
+                <div className="border-b border-rose-100 px-3 py-2.5">
+                  <p className="font-semibold text-gray-900">{profile?.name || "HeartLink member"}</p>
+                  <p className="mt-0.5 text-xs text-gray-500">Manage your account</p>
+                </div>
+                <ul className="flex flex-col py-2 text-sm">
                   <li>
                     <Link
                       href="/profile/edit"
-                      className="block px-4 py-2 text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-gray-700 transition hover:bg-rose-50 hover:text-rose-600"
                     >
-                      Edit Profile
+                      <Settings size={16} /> Edit profile
                     </Link>
                   </li>
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-rose-600 transition hover:bg-rose-50"
                     >
-                      Logout
+                      <LogOut size={16} /> Log out
                     </button>
                   </li>
                 </ul>
@@ -210,7 +217,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-[60px] left-0 w-full bg-white border-t border-gray-200 shadow-md md:hidden flex flex-col items-center py-4 space-y-3 text-gray-700 text-sm z-40"
+            className="absolute left-0 top-full flex w-full flex-col items-center space-y-2 border-t border-rose-100 bg-white/95 px-4 py-4 text-sm text-gray-700 shadow-xl shadow-rose-100/70 backdrop-blur-xl md:hidden z-40"
           >
             <NavLinks />
           </motion.div>
