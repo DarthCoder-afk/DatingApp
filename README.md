@@ -195,6 +195,16 @@ Add `-d` to run in the background: `docker compose up --build -d`.
 
 Compose waits for PostgreSQL to become healthy, applies the Prisma schema, then starts the backend. The frontend is built with browser-facing URLs for the exposed backend at `http://localhost:5001`.
 
+### Watch mode
+
+For local development with automatic updates, run:
+
+```bash
+docker compose watch
+```
+
+Changes in `frontend/src`, `frontend/public`, and `backend/src` are synchronized into their containers. Next.js and Nodemon reload the relevant app automatically. Changes to package manifests or pnpm lockfiles rebuild the affected image.
+
 You should see:
 ```
 ✅ Database connected successfully
@@ -220,6 +230,7 @@ To run a service outside Docker instead, install its dependencies with `pnpm ins
 | `docker compose down` | Stop all services |
 | `docker compose down -v` | Stop services and delete database volume |
 | `docker compose up --build` | Rebuild and start frontend + backend + postgres |
+| `docker compose watch` | Start development containers and sync code changes |
 
 ### Docker architecture (local)
 

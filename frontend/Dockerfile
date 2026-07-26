@@ -6,6 +6,22 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
+FROM node:22-alpine AS development
+WORKDIR /app
+
+RUN corepack enable
+
+ARG NEXT_PUBLIC_API_URL=http://localhost:5000/api
+ARG NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+EXPOSE 3000
+CMD ["pnpm", "dev"]
+
 FROM node:22-alpine AS builder
 WORKDIR /app
 
@@ -20,7 +36,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build
 
-FROM node:22-alpine
+FROM node:22-alpine AS production
 WORKDIR /app
 
 RUN corepack enable
