@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Compass, Heart, LogOut, Menu, MessageCircle, Settings, X } from "lucide-react";
 import Image from "next/image";
-import toast from "react-hot-toast";
 
 type Profile = {
   id: number;
@@ -72,35 +71,12 @@ export default function Navbar() {
     router.push("/login");
   };
 
-  // ✅ Handle Messages link click
-  const handleMessagesClick = async (e: React.MouseEvent) => {
-    e.preventDefault(); // prevent Link default navigation
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("Please log in first");
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/conversations`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      if (Array.isArray(data) && data.length === 0) {
-        toast.error("You need to have a match to unlock this 💔");
-      } else {
-        router.push("/messages");
-      }
-    } catch (err) {
-      console.error("Error checking matches:", err);
-      toast.error("Failed to load messages");
-    }
-  };
   const NavLinks = () => (
     <>
       {[
         { href: "/home", label: "Discover", icon: Compass },
         { href: "/matchlist", label: "Matches", icon: Heart },
-        { href: "/messages", label: "Messages", icon: MessageCircle, onClick: handleMessagesClick },
+        { href: "/messages", label: "Messages", icon: MessageCircle },
       ].map(({ href, label, icon: Icon, onClick }) => (
         <Link
           key={href}
