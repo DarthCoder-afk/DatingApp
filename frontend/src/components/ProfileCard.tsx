@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { Heart, UserRound, X } from "lucide-react";
 
 interface ProfileCardProps {
   profile: {
@@ -15,69 +16,65 @@ interface ProfileCardProps {
   };
   onLike: () => void;
   onPass: () => void;
+  hideActions?: boolean;
 }
 
-export default function ProfileCard({ profile, onLike, onPass }: ProfileCardProps) {
-    const getDefaultPhoto = () => {
-      if (profile.gender?.toLowerCase() === "male") {
-        return "/default/default-male.svg";
-      } else if (profile.gender?.toLowerCase() === "female") {
-        return "/default/default-female.svg";
-      } else {
-        return "/default/default_profile.svg"; // neutral or unknown
-      }
-    };
+export default function ProfileCard({ profile, onLike, onPass, hideActions = false }: ProfileCardProps) {
+  const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${profile.name}-${profile.id}`)}&backgroundColor=ffe4e6`;
+  const hasUploadedPhoto = Boolean(profile.photoUrl && !profile.photoUrl.startsWith("https://api.dicebear.com/"));
+  const avatarUrl = profile.photoUrl || dicebearUrl;
 
-    const imageUrl = profile.photoUrl || getDefaultPhoto();
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="card card-compact bg-base-100 transition-all border-t-8 border-rose-500  min-h-120"
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
+      className="group overflow-hidden rounded-[1.75rem] border border-rose-100 bg-white shadow-lg shadow-rose-100/60"
     >
-      {/* Profile Image */}
-      <figure className="px-10 pt-10">
-        <div className="avatar">
-          <div className="w-50 rounded-full ring ring-rose-600 ring-offset-base-100 ring-offset-2">
-            <Image
-              src={imageUrl}
-              alt={profile.name || "Profile Photo"}
-              className="object-cover"
-              width={128}
-              height={128}
-            />
-          </div>
+      <div className="relative aspect-[4/5] overflow-hidden bg-rose-50">
+        {hasUploadedPhoto ? (
+          <Image src={avatarUrl} alt={`${profile.name}'s profile`} fill sizes="(min-width: 1280px) 280px, (min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.03]" />
+        ) : (
+          // DiceBear returns a generated SVG; loading it directly avoids Next image-host configuration at runtime.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt={`${profile.name}'s generated avatar`} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-gray-950/75 via-gray-950/20 to-transparent" />
+        {profile.gender && <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold capitalize text-gray-700 shadow-sm backdrop-blur"><UserRound size={13} /> {profile.gender}</span>}
+        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+          <h2 className="text-2xl font-bold tracking-tight">{profile.name}, {profile.age}</h2>
+          <p className="mt-1 line-clamp-2 text-sm leading-5 text-white/85">{profile.bio || "Here to meet someone genuine and see where the conversation goes."}</p>
         </div>
-      </figure>
+      </div>
 
-      {/* Card Body */}
-      <div className="card-body items-center text-center">
-        <h2 className="card-title text-xl font-semibold">
-          {profile.name}, {profile.age}
-        </h2>
-        <p className="text-gray-600 text-sm">{profile.bio || "No bio available"}</p>
-
-        {/* Action Buttons */}
-        <div className="card-actions mt-4 flex gap-4">
-          <button
+      {!hideActions && <div className="flex items-center justify-between px-5 py-4">
+        <span className="text-xs font-medium text-gray-400">Choose an action</span>
+        <div className="flex items-center gap-3">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
             onClick={() => {
               toast.success("You have rejected this person");
               onPass();
             }}
-            className="btn btn-outline btn-sm rounded-full"
+            aria-label={`Pass on ${profile.name}`}
+            title="Pass"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
           >
-            ❌ Pass
-          </button>
-          <button
+            <X size={21} strokeWidth={2.4} />
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.92 }}
             onClick={() => {
               toast.success("You have liked this person");
               onLike();
             }}
-            className="btn btn-sm btn-error rounded-full"
+            aria-label={`Like ${profile.name}`}
+            title="Like"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-600 text-white shadow-lg shadow-rose-200 transition hover:bg-rose-700"
           >
-            ❤️ Like
-          </button>
+            <Heart size={20} fill="currentColor" />
+          </motion.button>
         </div>
-      </div>
+      </div>}
     </motion.div>
   );
 }

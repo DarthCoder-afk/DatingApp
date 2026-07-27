@@ -1,30 +1,18 @@
-# Build stage
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS development
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+RUN corepack enable && apk add --no-cache openssl libc6-compat
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN pnpm prisma:generate
 
 COPY src ./src
 
-# Production stage
-FROM node:20-alpine
-WORKDIR /app
+EXPOSE 5000
+CMD ["pnpm", "dev"]
 
-ENV NODE_ENV=production
-
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
-
-# Prisma client from build stage
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-
-COPY prisma ./prisma
-COPY src ./src
-
-EXPOSE 8080
+FROM development AS production
 CMD ["node", "src/server.js"]

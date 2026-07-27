@@ -71,7 +71,7 @@ Built with **Next.js**, **Express.js**, **Prisma**, **PostgreSQL**, and **Socket
 ### Deployment
 | Service  | Platform | Notes |
 |----------|----------|-------|
-| Frontend | Vercel   | Root directory: `frontend`, Node.js 20.x |
+| Frontend | Vercel   | Root directory: `frontend`, Node.js 22.x |
 | Backend  | Render   | Root directory: `backend`, Node runtime |
 | Database | Neon     | PostgreSQL 16, `sslmode=require` |
 
@@ -81,7 +81,7 @@ Built with **Next.js**, **Express.js**, **Prisma**, **PostgreSQL**, and **Socket
 
 ```
 DatingApp/
-├── docker-compose.yml   # Local Postgres + backend (Docker)
+├── docker-compose.yml   # Local frontend + backend + Postgres (Docker)
 ├── backend/
 │   ├── prisma/          # Database schema and Prisma client
 │   ├── src/
@@ -89,10 +89,11 @@ DatingApp/
 │   │   ├── controllers/ # Route controllers
 │   │   ├── middleware/  # Auth middleware
 │   │   └── routes/      # API routes
-│   ├── Dockerfile       # Production container image
+│   ├── Dockerfile       # Backend container image
 │   ├── .env.example
 │   └── package.json
 └── frontend/
+    ├── Dockerfile       # Frontend container image
     ├── public/          # Static assets
     ├── src/
     │   ├── app/         # Next.js App Router pages
@@ -107,7 +108,7 @@ DatingApp/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js 20.9+** and npm
+- **Node.js 22.13+** and [pnpm](https://pnpm.io/installation)
 - PostgreSQL database (local, Docker, or [Neon](https://neon.tech))
 - [Cloudinary](https://cloudinary.com) account (for profile photos)
 - Git
@@ -124,27 +125,27 @@ DatingApp/
 2. **Set up the backend**
    ```bash
    cd backend
-   npm install
+   pnpm install
 
    cp .env.example .env
    # Edit .env with your DATABASE_URL, JWT_SECRET, and Cloudinary keys
 
-   npx prisma generate
-   npx prisma db push
+   pnpm prisma:generate
+   pnpm prisma:push
 
-   npm run dev
+   pnpm dev
    ```
    Backend runs at `http://localhost:5000` by default.
 
 3. **Set up the frontend**
    ```bash
    cd frontend
-   npm install
+   pnpm install
 
    cp .env.example .env.local
    # Edit .env.local (see Environment Variables below)
 
-   npm run dev
+   pnpm dev
    ```
    Frontend runs at `http://localhost:3000`.
 
@@ -161,19 +162,13 @@ CLOUD_API_KEY=your-key
 CLOUD_API_SECRET=your-secret
 ```
 
-**Frontend** (`frontend/.env.local`):
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
-```
-
 > Never commit `.env` or `.env.local` files. Use `.env.example` for placeholders only.
 
 ---
 
 ## 🐳 Docker (Local Development)
 
-Run the **backend** and **PostgreSQL** in Docker while keeping the **frontend** on your machine (`npm run dev`). Secrets stay in `backend/.env` (gitignored); `docker-compose.yml` is safe to commit.
+Run the complete application—**frontend, backend, and PostgreSQL**—with Docker Compose. Secrets stay in `backend/.env` (gitignored); `docker-compose.yml` is safe to commit.
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
@@ -188,29 +183,27 @@ cp .env.example .env
 
 Edit `backend/.env` with your JWT and Cloudinary credentials. You do not need to set `DATABASE_URL` for Docker — Compose overrides it with the local Postgres service.
 
-### 2. Start PostgreSQL
+### 2. Build and start every service
 
 From the repository root:
 
 ```bash
-docker compose up -d postgres
+docker compose up --build
 ```
 
-### 3. Apply the database schema (first time only)
+Add `-d` to run in the background: `docker compose up --build -d`.
+
+Compose waits for PostgreSQL to become healthy, applies the Prisma schema, then starts the backend. The frontend is built with browser-facing URLs for the exposed backend at `http://localhost:5001`.
+
+### Watch mode
+
+For local development with automatic updates, run:
 
 ```bash
-cd backend
-DATABASE_URL="postgresql://heartlink:heartlink@localhost:5432/heartlink" npx prisma db push
+docker compose watch
 ```
 
-### 4. Build and start the backend
-
-```bash
-cd ..
-docker compose up --build backend
-```
-
-Add `-d` to run in the background: `docker compose up --build -d backend`.
+Changes in `frontend/src`, `frontend/public`, and `backend/src` are synchronized into their containers. Next.js and Nodemon reload the relevant app automatically. Changes to package manifests or pnpm lockfiles rebuild the affected image.
 
 You should see:
 ```
@@ -224,44 +217,28 @@ If the database connection fails on the first attempt, wait a few seconds for Po
 docker compose restart backend
 ```
 
-### 5. Start the frontend locally
+Open **http://localhost:3000** once the containers are running.
 
-In a separate terminal:
-
-```bash
-cd frontend
-npm install
-```
-
-Create `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
-```
-
-```bash
-npm run dev
-```
-
-Open **http://localhost:3000**.
+To run a service outside Docker instead, install its dependencies with `pnpm install` in that service directory and use `pnpm dev`. Use the environment variables shown above so the local frontend can reach the Docker backend.
 
 ### Docker commands
 
 | Command | Purpose |
 |---------|---------|
 | `docker compose ps` | List running services |
-| `docker compose logs -f backend` | Stream backend logs |
+| `docker compose logs -f frontend backend` | Stream application logs |
 | `docker compose down` | Stop all services |
 | `docker compose down -v` | Stop services and delete database volume |
-| `docker compose up --build` | Rebuild and start postgres + backend |
+| `docker compose up --build` | Rebuild and start frontend + backend + postgres |
+| `docker compose watch` | Start development containers and sync code changes |
 
 ### Docker architecture (local)
 
 ```
 Browser (localhost:3000)
-  → Frontend (npm run dev on host)
-  → Backend (Docker, localhost:5000)
-  → PostgreSQL (Docker, localhost:5432)
+  → Frontend (Docker)
+  → Backend (Docker, localhost:5001)
+  → PostgreSQL (Docker)
   → Cloudinary (external)
 ```
 
@@ -270,8 +247,8 @@ Browser (localhost:3000)
 | Problem | Fix |
 |---------|-----|
 | Port `5432` already in use | Stop local Postgres or change the port mapping in `docker-compose.yml` |
-| Port `5000` already in use | Change to `"5001:5000"` in compose and update frontend env vars |
-| `Database connection failed` | Run `prisma db push`, then `docker compose restart backend` |
+| Port `5001` already in use | Change the backend port mapping and the frontend build arguments together in `docker-compose.yml` |
+| `Database connection failed` | Check `docker compose logs backend`; Compose applies the schema at backend startup |
 | Photo upload fails | Add valid Cloudinary keys to `backend/.env` and restart the backend |
 
 ---
@@ -280,18 +257,18 @@ Browser (localhost:3000)
 
 ### Frontend (Vercel)
 - **Root Directory:** `frontend`
-- **Node.js Version:** 20.x
+- **Node.js Version:** 22.x
 - **Environment variables:**
   ```env
-  NEXT_PUBLIC_API_URL=https://heartlink-api-xhev.onrender.com/api
-  NEXT_PUBLIC_SOCKET_URL=https://heartlink-api-xhev.onrender.com
+  NEXT_PUBLIC_API_URL=https://service.com/api
+  NEXT_PUBLIC_SOCKET_URL=https://service.com
   ```
 
 ### Backend (Render)
 - **Root Directory:** `backend`
 - **Runtime:** Node
-- **Build Command:** `npm install --include=dev && npx prisma generate`
-- **Start Command:** `npm start`
+- **Build Command:** `pnpm install --frozen-lockfile && pnpm prisma:generate`
+- **Start Command:** `pnpm start`
 - **Environment variables:** same as `backend/.env` (use Neon `DATABASE_URL` with `?sslmode=require`)
 
 ### Database (Neon)
@@ -300,7 +277,7 @@ Browser (localhost:3000)
 3. Apply schema once:
    ```bash
    cd backend
-   npx prisma db push
+   pnpm prisma:push
    ```
 
 ### CORS
