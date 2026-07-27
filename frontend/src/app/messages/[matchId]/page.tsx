@@ -82,7 +82,7 @@ export default function ChatPage() {
 
     const handleReceive = (message: Message) => {
       console.log("📩 New message received:", message);
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => prev.some((existing) => existing.id === message.id) ? prev : [...prev, message]);
     };
 
     socket.off("receiveMessage", handleReceive); // ✅ prevent duplicates
@@ -119,8 +119,9 @@ export default function ChatPage() {
     const savedMessage = await res.json();
     if (!res.ok) throw new Error(savedMessage.message);
 
-    // ✅ Only emit — don’t append manually
-    socket?.emit("sendMessage", { matchId, content: newMessage });
+    // The HTTP response is the source of truth, so the sender sees their first
+    // message immediately even if the socket has not finished joining the room.
+    setMessages((prev) => prev.some((message) => message.id === savedMessage.id) ? prev : [...prev, savedMessage]);
     setNewMessage("");
   } catch (err: any) {
     toast.error(err.message || "Failed to send message");

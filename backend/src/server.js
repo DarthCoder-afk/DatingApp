@@ -55,7 +55,8 @@ app.use('/api/passes', passRoutes)
 app.use('/api/messages', messageRoutes)
 
 
-setupSocket(server);
+const io = setupSocket(server);
+app.set('io', io);
 
 
 
