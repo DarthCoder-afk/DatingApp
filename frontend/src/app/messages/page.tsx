@@ -120,10 +120,7 @@ export default function MessagesPage() {
                 >
                     <div className="relative shrink-0">
                     <div className="h-14 w-14 overflow-hidden rounded-2xl border border-rose-100 bg-rose-50">
-                        {conv.user.profile.photoUrl?.startsWith("https://api.dicebear.com/") ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={conv.user.profile.photoUrl} alt={conv.user.profile.name} className="h-full w-full object-cover" />
-                        ) : <Image src={conv.user.profile.photoUrl || "/default/default_profile.svg"} alt={conv.user.profile.name} width={120} height={120} className="h-full w-full object-cover" />}
+                        <ConversationAvatar conversation={conv} />
                     </div>
                     </div>
 
@@ -158,8 +155,13 @@ export default function MessagesPage() {
 function ConversationAvatar({ conversation }: { conversation: Conversation }) {
   const photoUrl = conversation.user.profile.photoUrl;
   const name = conversation.user.profile.name;
-  if (photoUrl?.startsWith("https://api.dicebear.com/")) return <img src={photoUrl} alt={name} className="h-full w-full object-cover" />;
-  return <Image src={photoUrl || "/default/default_profile.svg"} alt={name} width={96} height={96} className="h-full w-full object-cover" />;
+  const dicebearUrl = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${name}-${conversation.user.id}`)}&backgroundColor=ffe4e6`;
+  const avatarUrl = photoUrl || dicebearUrl;
+  if (avatarUrl.startsWith("https://api.dicebear.com/")) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />;
+  }
+  return <Image src={avatarUrl} alt={name} width={96} height={96} className="h-full w-full object-cover" />;
 }
 
 function getUserIdFromToken(token: string | null): number | null {
