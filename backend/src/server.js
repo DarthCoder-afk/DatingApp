@@ -39,10 +39,17 @@ connectDb();
 
 app.use('/api', apiRoutes);
 
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    message: 'Datingapp API is running',
+    health: '/api/health',
+    databaseHealth: '/api/health/db',
+  });
+});
+
 const io = setupSocket(server);
 app.set('io', io);
 
 server.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
-  console.log("Datingapp API is running");
 });
