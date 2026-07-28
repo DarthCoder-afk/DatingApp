@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { apiRequest } from "../../lib/api";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { ArrowLeft, EyeOff, Eye, Heart, LockKeyhole, Mail } from "lucide-react";
@@ -40,22 +39,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-rose-50 text-gray-800">
+    <div className="flex min-h-screen bg-[#f8f2eb] text-[#2d2023]">
       {/* Left Form */}
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex w-full flex-col justify-center bg-white px-6 py-10 sm:px-10 md:w-1/2 md:px-16"
+        className="flex w-full flex-col justify-center bg-[#fffdf9] px-6 py-10 sm:px-10 md:w-1/2 md:px-16"
       >
         <div className="mx-auto w-full max-w-md">
-          <Link href="/" className="mb-10 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-rose-600">
+          <Link href="/" className="mb-10 inline-flex items-center gap-2 text-sm font-medium text-[#827074] transition hover:text-[#c65743]">
             <ArrowLeft size={16} /> Back to home
           </Link>
           <div className="mb-8">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-rose-500">Welcome back</p>
-            <h2 className="text-3xl font-bold text-gray-900">Log in to HeartLink</h2>
-            <p className="mt-3 text-gray-500">Pick up where your connections left off.</p>
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#c65743]">Welcome back</p>
+            <h2 className="font-serif text-4xl font-semibold tracking-tight text-[#2d2023]">Your next chapter is waiting.</h2>
+            <p className="mt-3 text-[#827074]">Pick up where your connections left off.</p>
           </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
@@ -106,7 +105,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-rose-600 py-3 font-semibold text-white shadow-lg shadow-rose-200 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-xl bg-[#c95744] py-3 font-semibold text-white shadow-lg shadow-[#e8b8ab] transition hover:bg-[#a94435] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
@@ -127,22 +126,11 @@ export default function LoginPage() {
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-rose-200 via-pink-300 to-rose-400 p-10 text-center text-gray-800 md:flex"
+        className="relative hidden w-1/2 flex-col items-center justify-end overflow-hidden bg-[#2d2023] p-12 text-left text-white md:flex"
       >
-        <div className="absolute -left-20 -top-20 h-56 w-56 rounded-full bg-white/20 blur-2xl" />
-        <div className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-rose-600/15 blur-2xl" />
-        <Image
-          src="/login page/login.svg"
-          alt="Login Illustration"
-          width={380}
-          height={380}
-          className="relative mb-8 rounded-2xl"
-        />
-        <p className="relative mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-rose-800">HeartLink</p>
-        <h2 className="relative mb-3 text-3xl font-bold">Find Your Perfect Match 💕</h2>
-        <p className="relative max-w-md text-md leading-7">
-          Connect, chat, and match with amazing people nearby. Your next connection might be just one swipe away.
-        </p>
+        <div className="absolute inset-0 bg-cover bg-center opacity-90" style={{ backgroundImage: "url('/images/heartlink-login-editorial.png')" }} />
+        <div className="absolute inset-0 bg-linear-to-t from-[#2d2023] via-[#2d2023]/30 to-transparent" />
+        <div className="relative max-w-md"><span className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#d66b53] text-white"><Heart fill="currentColor" size={20} /></span><p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#f4b7a4]">HeartLink</p><h2 className="font-serif text-5xl font-semibold leading-[0.96]">Come back to the good part.</h2><p className="mt-5 max-w-sm leading-7 text-white/75">The next message, match, or moment could be waiting for you.</p></div>
       </motion.div>
     </div>
   );

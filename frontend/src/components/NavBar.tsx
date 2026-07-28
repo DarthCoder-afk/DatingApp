@@ -95,7 +95,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-rose-100/80 bg-white/90 px-4 py-3 shadow-sm shadow-rose-100/60 backdrop-blur-xl md:px-10">
+    <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-[#eadbd1]/80 bg-[#fffdf9]/90 px-4 py-3 shadow-sm shadow-[#e9ddd4]/60 backdrop-blur-xl md:px-10">
         {/* MOBILE MENU ICON */}
         <button
           className="rounded-xl p-2 text-gray-700 transition hover:bg-rose-50 hover:text-rose-600 md:hidden"
@@ -107,12 +107,12 @@ export default function Navbar() {
       {/* LEFT: Logo */}
       <Link href="/home" className="flex items-center gap-2.5">
         <motion.span
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-200"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#d66750] to-[#a43f4d] text-white shadow-lg shadow-[#e8b8ab]"
           whileHover={{ scale: 1.1 }}
         >
           <Heart size={20} fill="currentColor" />
         </motion.span>
-        <span className="text-xl font-bold tracking-tight text-gray-900">HeartLink</span>
+        <span className="font-serif text-2xl font-semibold tracking-tight text-[#2d2023]">HeartLink</span>
       </Link>
 
       {/* DESKTOP NAV */}

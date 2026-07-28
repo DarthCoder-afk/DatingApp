@@ -158,7 +158,7 @@ export default function HomePage() {
     );
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
+    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
       <div className="hidden md:block"><NavBar /></div>
 
       <main className="min-h-screen bg-[#fcfcfc] pb-24 md:hidden">
@@ -195,37 +195,39 @@ export default function HomePage() {
         </nav>
       </main>
 
-      <main className="mx-auto hidden max-w-6xl px-5 py-8 md:block md:px-10 md:py-12">
+      <main className="mx-auto hidden max-w-7xl px-5 py-8 md:block md:px-10 md:py-10">
         <motion.section
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-8 flex flex-col gap-6 border-b border-rose-100 pb-8 md:flex-row md:items-end md:justify-between"
+          className="relative mb-8 min-h-[350px] overflow-hidden rounded-[2.25rem] bg-[#352128] p-8 text-white shadow-[0_24px_60px_rgba(65,39,45,0.2)] md:p-11"
         >
-          <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-600"><Sparkles size={15} /> Discover people</p>
-            <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">Find someone who shares your vibe.</h1>
-            <p className="mt-3 max-w-xl text-gray-600">Explore thoughtfully selected profiles and make the first move when it feels right.</p>
+          <div className="absolute inset-0 bg-cover bg-[center_right_28%] opacity-75" style={{ backgroundImage: "url('/images/heartlink-date-journal-hero.png')" }} />
+          <div className="absolute inset-0 bg-linear-to-r from-[#352128] via-[#352128]/95 to-[#352128]/20" />
+          <div className="relative max-w-xl">
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white/90 backdrop-blur"><Sparkles size={15} className="text-[#f6a88d]" /> Your next chapter starts here</p>
+            <h1 className="max-w-md font-serif text-5xl leading-[0.96] tracking-[-0.04em] text-[#fffaf4] md:text-6xl">Meet someone worth lingering for.</h1>
+            <p className="mt-5 max-w-md text-[15px] leading-6 text-white/72">Thoughtful connections, a little less scrolling. Explore people who could turn an ordinary Tuesday into a favorite story.</p>
           </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-rose-50 px-4 py-3 text-rose-600">
-            <UsersRound size={22} />
-            <div><p className="text-xs text-rose-500">Profiles to explore</p><p className="text-xl font-bold">{filteredProfiles.length}</p></div>
+          <div className="relative mt-8 inline-flex items-center gap-3 self-start rounded-2xl border border-white/15 bg-[#fffaf4]/10 px-4 py-3 backdrop-blur md:absolute md:bottom-9 md:right-10 md:mt-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e67c62] text-white"><UsersRound size={20} /></div>
+            <div><p className="text-xs text-white/60">Awaiting a hello</p><p className="text-xl font-bold text-white">{filteredProfiles.length} people</p></div>
           </div>
         </motion.section>
 
-        <section className="mb-10 rounded-3xl border border-rose-100 bg-white/85 p-5 shadow-lg shadow-rose-100/50 backdrop-blur-sm md:p-6">
+        <section className="mb-10 rounded-[1.8rem] border border-[#eadbd1] bg-[#fffdf9] p-5 shadow-[0_14px_36px_rgba(89,55,47,0.08)] md:p-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-600"><SlidersHorizontal size={20} /></div>
-              <div><h2 className="font-semibold text-gray-900">Refine your discovery</h2><p className="text-sm text-gray-500">Choose who you would like to see.</p></div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f7dfd2] text-[#c65743]"><SlidersHorizontal size={20} /></div>
+              <div><h2 className="font-semibold text-[#2d2023]">Fine-tune the chemistry</h2><p className="text-sm text-[#827074]">Set the scene for who you&apos;d like to meet.</p></div>
             </div>
-            <button onClick={() => { setGender("all"); setAgeRange([MIN_AGE, MAX_AGE]); }} className="inline-flex items-center gap-2 self-start text-sm font-semibold text-rose-600 transition hover:text-rose-700 md:self-auto"><RotateCcw size={15} /> Reset</button>
+            <button onClick={() => { setGender("all"); setAgeRange([MIN_AGE, MAX_AGE]); }} className="inline-flex items-center gap-2 self-start text-sm font-semibold text-[#c65743] transition hover:text-[#8f3e32] md:self-auto"><RotateCcw size={15} /> Reset</button>
           </div>
 
           <div className="mt-6 grid gap-6 md:grid-cols-[180px_1fr] md:items-end">
             <div>
-              <label htmlFor="discover-gender" className="mb-2 block text-sm font-semibold text-gray-700">Interested in</label>
-              <select id="discover-gender" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100" value={gender} onChange={(e) => setGender(e.target.value)}>
+              <label htmlFor="discover-gender" className="mb-2 block text-sm font-semibold text-[#4b393d]">Interested in</label>
+              <select id="discover-gender" className="w-full rounded-xl border border-[#e8ddd5] bg-[#fbf7f2] px-4 py-3 text-[#2d2023] outline-none transition focus:border-[#d76952] focus:bg-white focus:ring-4 focus:ring-[#f7dfd2]" value={gender} onChange={(e) => setGender(e.target.value)}>
                 <option value="all">All genders</option>
                 <option value="male">Men</option>
                 <option value="female">Women</option>
@@ -233,7 +235,7 @@ export default function HomePage() {
             </div>
 
             <div>
-              <div className="mb-3 flex items-center justify-between"><label className="text-sm font-semibold text-gray-700">Age range</label><span className="rounded-full bg-rose-50 px-3 py-1 text-sm font-semibold text-rose-600">{ageRange[0]} – {ageRange[1]}</span></div>
+              <div className="mb-3 flex items-center justify-between"><label className="text-sm font-semibold text-[#4b393d]">Age range</label><span className="rounded-full bg-[#f7dfd2] px-3 py-1 text-sm font-semibold text-[#b64b39]">{ageRange[0]} – {ageRange[1]}</span></div>
               <Range
                 step={1}
                 min={MIN_AGE}
@@ -241,14 +243,14 @@ export default function HomePage() {
                 values={ageRange}
                 onChange={(values) => setAgeRange([values[0], values[1]])}
                 renderTrack={({ props, children }) => (
-                  <div {...props} className="relative h-2 w-full rounded-full bg-gray-200">
-                    <div className="absolute h-2 rounded-full bg-rose-500" style={{ left: `${((ageRange[0] - MIN_AGE) / (MAX_AGE - MIN_AGE)) * 100}%`, width: `${((ageRange[1] - ageRange[0]) / (MAX_AGE - MIN_AGE)) * 100}%` }} />
+                  <div {...props} className="relative h-2 w-full rounded-full bg-[#eee3db]">
+                    <div className="absolute h-2 rounded-full bg-[#d76952]" style={{ left: `${((ageRange[0] - MIN_AGE) / (MAX_AGE - MIN_AGE)) * 100}%`, width: `${((ageRange[1] - ageRange[0]) / (MAX_AGE - MIN_AGE)) * 100}%` }} />
                     {children}
                   </div>
                 )}
                 renderThumb={({ props, index }) => {
                   const { key, ...rest } = props;
-                  return <div key={key} {...rest} aria-label={index === 0 ? "Minimum age" : "Maximum age"} className="h-5 w-5 rounded-full border-2 border-rose-500 bg-white shadow-md outline-none ring-offset-2 focus:ring-2 focus:ring-rose-300" />;
+                  return <div key={key} {...rest} aria-label={index === 0 ? "Minimum age" : "Maximum age"} className="h-5 w-5 rounded-full border-2 border-[#d76952] bg-white shadow-md outline-none ring-offset-2 focus:ring-2 focus:ring-[#f2b9a8]" />;
                 }}
               />
             </div>
@@ -257,7 +259,7 @@ export default function HomePage() {
 
       <section>
         <div className="mb-6 flex items-end justify-between">
-          <div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-rose-500">Discover</p><h2 className="mt-1 text-2xl font-bold text-gray-900">People you may like</h2></div>
+          <div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#c65743]">The guest list</p><h2 className="mt-1 font-serif text-3xl font-semibold text-[#2d2023]">People you may like</h2></div>
           <div className="group relative hidden sm:block">
             <button type="button" aria-label="How profile actions work" className="flex h-9 w-9 items-center justify-center rounded-full border border-rose-100 bg-white text-gray-400 shadow-sm transition hover:border-rose-200 hover:text-rose-600 focus:outline-none focus:ring-4 focus:ring-rose-100">
               <CircleHelp size={18} />

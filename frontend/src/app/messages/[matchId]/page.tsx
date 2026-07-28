@@ -135,20 +135,20 @@ export default function ChatPage() {
     );
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
+    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
       <div className="hidden md:block"><NavBar /></div>
       <main className="mx-auto flex h-screen max-w-5xl flex-col md:h-[calc(100vh-72px)] md:px-8 md:py-6">
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white md:rounded-3xl md:border md:border-rose-100 md:shadow-xl md:shadow-rose-100/60">
-          <header className="flex items-center justify-between border-b border-rose-100 bg-white px-5 py-4 md:px-6">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#fffdf9] md:rounded-[2rem] md:border md:border-[#eadbd1] md:shadow-[0_16px_40px_rgba(89,55,47,0.08)]">
+          <header className="flex items-center justify-between border-b border-[#eadbd1] bg-[#fffdf9] px-5 py-4 md:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <button onClick={() => router.push("/messages")} aria-label="Back to messages" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-500 transition hover:bg-rose-50 hover:text-rose-600"><ArrowLeft size={20} /></button>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600"><MessageCircle size={20} /></div>
-              <div className="min-w-0"><h1 className="truncate font-bold text-gray-900">{otherParticipant?.name || "Your conversation"}</h1><p className="text-xs text-gray-500">A space for a real connection</p></div>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#f7dfd2] text-[#c65743]"><MessageCircle size={20} /></div>
+              <div className="min-w-0"><h1 className="truncate font-serif text-xl font-semibold text-[#2d2023]">{otherParticipant?.name || "Your conversation"}</h1><p className="text-xs text-[#827074]">A space for a real connection</p></div>
             </div>
             <span className="hidden items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 sm:inline-flex"><Sparkles size={14} /> Matched</span>
           </header>
 
-        <div className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,_rgba(251,113,133,0.12),_transparent_32%),linear-gradient(to_bottom,_#fff7f8,_#fff)] px-4 py-6 md:px-7">
+        <div className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,_rgba(214,107,83,0.13),_transparent_32%),linear-gradient(to_bottom,_#fffaf5,_#f8f2eb)] px-4 py-6 md:px-7">
           {messages.length === 0 ? <div className="flex h-full flex-col items-center justify-center text-center"><div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-rose-100 text-rose-600"><MessageCircle size={26} /></div><h2 className="mt-5 text-xl font-bold text-gray-900">Start the conversation</h2><p className="mt-2 max-w-sm text-sm leading-6 text-gray-600">Try a thoughtful hello, a shared interest, or something that made you smile today.</p></div> : <div className="space-y-5">
           {messages.map((msg, idx) => {
             const isMine = msg.sender.id === userId;
@@ -161,7 +161,7 @@ export default function ChatPage() {
                 {!isMine && <img src={avatarUrl} alt={msg.sender.profile.name} className="h-9 w-9 shrink-0 self-end rounded-xl border border-rose-100 bg-rose-50 object-cover" />}
                 <div className={`max-w-[78%] md:max-w-[65%] ${isMine ? "items-end" : "items-start"}`}>
                   {!isMine && <p className="mb-1 px-1 text-xs font-semibold text-gray-500">{msg.sender.profile.name}</p>}
-                  <div className={`rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${isMine ? "rounded-br-md bg-rose-600 text-white shadow-rose-200" : "rounded-bl-md border border-rose-100 bg-white text-gray-700"}`}><p className="break-words">{msg.content}</p></div>
+                  <div className={`rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${isMine ? "rounded-br-md bg-[#c95744] text-white shadow-[#e8b8ab]" : "rounded-bl-md border border-[#eadbd1] bg-[#fffdf9] text-[#4e3b3f]"}`}><p className="break-words">{msg.content}</p></div>
                   <p className={`mt-1 px-1 text-[11px] text-gray-400 ${isMine ? "text-right" : "text-left"}`}>{formatTimestamp(msg.createdAt)}</p>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function ChatPage() {
 
         <form
           onSubmit={handleSend}
-          className="flex gap-3 border-t border-rose-100 bg-white p-4 md:p-5"
+          className="flex gap-3 border-t border-[#eadbd1] bg-[#fffdf9] p-4 md:p-5"
         >
           <input
             type="text"
@@ -186,7 +186,7 @@ export default function ChatPage() {
             type="submit"
             disabled={!newMessage.trim()}
             aria-label="Send message"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-600 text-white shadow-lg shadow-rose-200 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#c95744] text-white shadow-lg shadow-[#e8b8ab] transition hover:bg-[#a94435] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <SendHorizontal size={19} />
           </button>

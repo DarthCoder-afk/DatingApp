@@ -92,7 +92,7 @@ export default function MessagesPage() {
     );
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-rose-50 via-white to-pink-50">
+    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
         <div className="hidden md:block"><NavBar/></div>
         <main className="mx-auto max-w-4xl px-5 pb-24 pt-6 md:px-10 md:py-12">
             <section className="md:hidden">
@@ -109,14 +109,14 @@ export default function MessagesPage() {
                 {!conversations.some((conv) => conv.lastMessage) && <p className="pt-8 text-center text-sm text-slate-400">Open a match and send the first hello.</p>}
               </div>
             </section>
-            <section className="mb-8 hidden border-b border-rose-100 pb-8 md:block"><p className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-600"><Sparkles size={15} /> Your inbox</p><h1 className="mt-5 text-3xl font-bold text-gray-900 md:text-4xl">Conversations worth continuing.</h1><p className="mt-3 text-gray-600">Your mutual matches, all in one calm place.</p></section>
+            <section className="mb-8 hidden rounded-[2rem] bg-[#3b272d] p-8 text-white shadow-[0_18px_40px_rgba(65,39,45,0.18)] md:block"><p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-sm font-medium text-[#f2b9a8]"><Sparkles size={15} /> Your inbox</p><h1 className="mt-5 font-serif text-4xl font-semibold">Conversations worth continuing.</h1><p className="mt-3 text-white/70">Your mutual matches, all in one calm place.</p></section>
 
-            <div className="hidden overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-lg shadow-rose-100/60 md:block">
+            <div className="hidden overflow-hidden rounded-[2rem] border border-[#eadbd1] bg-[#fffdf9] shadow-[0_16px_40px_rgba(89,55,47,0.08)] md:block">
                 {conversations.map((conv) => (
                 <button
                     key={conv.matchId}
                     onClick={() => router.push(`/messages/${conv.matchId}`)}
-                    className="group flex w-full items-center gap-4 border-b border-rose-50 p-5 text-left transition last:border-0 hover:bg-rose-50/70"
+                    className="group flex w-full items-center gap-4 border-b border-[#f0e7df] p-5 text-left transition last:border-0 hover:bg-[#fff5ef]"
                 >
                     <div className="relative shrink-0">
                     <div className="h-14 w-14 overflow-hidden rounded-2xl border border-rose-100 bg-rose-50">
