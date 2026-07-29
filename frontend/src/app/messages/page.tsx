@@ -6,7 +6,8 @@ import Image from "next/image";
 import toast from "react-hot-toast";    
 import NavBar from "@/src/components/NavBar";
 import MobileBottomNav from "@/src/components/MobileBottomNav";
-import { ArrowLeft, ArrowUpRight, MessageCircle, Search, Sparkles } from "lucide-react";
+import { ArrowUpRight, MessageCircle } from "lucide-react";
+import AppSkeleton from "@/src/components/AppSkeleton";
 
 interface Conversation {
   matchId: number;
@@ -43,8 +44,8 @@ export default function MessagesPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setConversations(data);
-      } catch (err: any) {
-        toast.error(err.message || "Failed to load conversations");
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : "Failed to load conversations");
       } finally {
         setLoading(false);
       }
@@ -63,72 +64,62 @@ export default function MessagesPage() {
     });
   };
 
-  const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
-
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <span className="loading loading-spinner text-rose-600"></span>
+      <div className="app-shell">
+        <div className="hidden md:block"><NavBar /></div>
+        <main className="app-page">
+          <header className="app-page-header">
+            <div><p className="eyebrow">Messages</p><h1>Keep the conversation going.</h1><p className="subtle">Thoughtful exchanges, all in one calm place.</p></div>
+            <span className="app-page-mark"><MessageCircle size={20} /></span>
+          </header>
+          <AppSkeleton variant="list" />
+        </main>
+        <MobileBottomNav />
       </div>
     );
 
   if (!conversations.length)
     return (
-      <div className="min-h-screen bg-rose-50"><div className="hidden md:block"><NavBar /></div><div className="flex min-h-[calc(100vh-72px)] flex-col items-center justify-center px-6 pb-24 text-center">
-        <Image
-          src="/default/empty_chat.svg"
-          alt="Empty"
-          width={180}
-          height={180}
-          className="mb-6 opacity-80"
-        />
-        <h2 className="text-xl font-semibold text-gray-700">
-          No conversations yet 💬
-        </h2>
-        <p className="text-gray-500 mt-2 text-sm">
-          Start matching to unlock your chat inbox.
-        </p>
-      </div><MobileBottomNav /></div>
+      <div className="app-shell">
+        <div className="hidden md:block"><NavBar /></div>
+        <main className="app-page">
+          <header className="app-page-header">
+            <div><p className="eyebrow">Messages</p><h1>Keep the conversation going.</h1><p className="subtle">Thoughtful exchanges, all in one calm place.</p></div>
+            <span className="app-page-mark"><MessageCircle size={20} /></span>
+          </header>
+          <section className="app-empty"><span className="app-empty-icon"><MessageCircle size={25} /></span><h2>No conversations yet.</h2><p>When a match becomes mutual, start with something small and sincere.</p></section>
+        </main>
+        <MobileBottomNav />
+      </div>
     );
 
   return (
-    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
-        <div className="hidden md:block"><NavBar/></div>
-        <main className="mx-auto max-w-4xl px-5 pb-24 pt-6 md:px-10 md:py-12">
-            <section className="md:hidden">
-              <header className="flex items-center justify-between"><button onClick={() => router.push("/home")} aria-label="Back to discover" className="-ml-2 rounded-xl p-2 text-slate-800"><ArrowLeft size={22} /></button><h1 className="text-xl font-semibold text-slate-900">Chat</h1><button aria-label="Search conversations" className="-mr-2 rounded-xl p-2 text-slate-800"><Search size={21} /></button></header>
-
-              <div className="mt-5"><p className="text-sm font-medium text-slate-800">Recent match</p><div className="mt-3 flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none]">{conversations.slice(0, 8).map((conv) => <button key={`recent-${conv.matchId}`} onClick={() => router.push(`/messages/${conv.matchId}`)} className="flex w-11 shrink-0 flex-col items-center gap-1.5"><div className="h-11 w-11 overflow-hidden rounded-full bg-rose-100"><ConversationAvatar conversation={conv} /></div><span className="w-full truncate text-center text-[11px] font-medium text-slate-700">{conv.user.profile.name.split(" ")[0]}</span></button>)}</div></div>
-
-              <div className="mt-5 space-y-5">
-                {([true, false] as const).map((today) => {
-                  const group = conversations.filter((conv) => !conv.lastMessage ? today : isToday(conv.lastMessage.createdAt) === today);
-                  if (!group.length) return null;
-                  return <section key={today ? "today" : "earlier"}><h2 className="mb-2 text-sm font-medium text-slate-800">{today ? "Today Message" : "Earlier messages"}</h2><div>{group.map((conv) => <button key={conv.matchId} onClick={() => router.push(`/messages/${conv.matchId}`)} className="flex w-full items-center gap-3 py-2.5 text-left"><div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-rose-100"><ConversationAvatar conversation={conv} /></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-900">{conv.user.profile.name}</p><p className="mt-1 truncate text-xs text-slate-400">{conv.lastMessage ? `${conv.lastMessage.sender.id === getUserIdFromToken(token) ? "You: " : ""}${conv.lastMessage.content}` : "Say hi 👋"}</p></div><div className="self-start pt-1 text-[10px] text-slate-400">{conv.lastMessage ? formatTimestamp(conv.lastMessage.createdAt).split(",")[0] : ""}</div></button>)}</div></section>;
-                })}
-                {!conversations.some((conv) => conv.lastMessage) && <p className="pt-8 text-center text-sm text-slate-400">Open a match and send the first hello.</p>}
-              </div>
-            </section>
-            <section className="mb-8 hidden rounded-[2rem] bg-[#3b272d] p-8 text-white shadow-[0_18px_40px_rgba(65,39,45,0.18)] md:block"><p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-sm font-medium text-[#f2b9a8]"><Sparkles size={15} /> Your inbox</p><h1 className="mt-5 font-serif text-4xl font-semibold">Conversations worth continuing.</h1><p className="mt-3 text-white/70">Your mutual matches, all in one calm place.</p></section>
-
-            <div className="hidden overflow-hidden rounded-[2rem] border border-[#eadbd1] bg-[#fffdf9] shadow-[0_16px_40px_rgba(89,55,47,0.08)] md:block">
+    <div className="app-shell">
+        <div className="hidden md:block"><NavBar /></div>
+        <main className="app-page">
+            <header className="app-page-header">
+              <div><p className="eyebrow">Messages</p><h1>Keep the conversation going.</h1><p className="subtle">Thoughtful exchanges, all in one calm place.</p></div>
+              <span className="app-page-mark"><MessageCircle size={20} /></span>
+            </header>
+            <div className="app-panel">
                 {conversations.map((conv) => (
                 <button
                     key={conv.matchId}
                     onClick={() => router.push(`/messages/${conv.matchId}`)}
-                    className="group flex w-full items-center gap-4 border-b border-[#f0e7df] p-5 text-left transition last:border-0 hover:bg-[#fff5ef]"
+                    className="group flex w-full items-center gap-3 border-b border-[#eee5e0] p-4 text-left transition last:border-0 hover:bg-[#f9f1ed] sm:gap-4 sm:p-5"
                 >
                     <div className="relative shrink-0">
-                    <div className="h-14 w-14 overflow-hidden rounded-2xl border border-rose-100 bg-rose-50">
+                    <div className="h-12 w-12 overflow-hidden rounded-2xl border border-[#e8dcd6] bg-[#f2e4de] sm:h-14 sm:w-14">
                         <ConversationAvatar conversation={conv} />
                     </div>
                     </div>
 
                     <div className="flex-1 overflow-hidden">
-                    <h3 className="truncate font-semibold text-gray-900">
+                    <h3 className="truncate font-semibold text-[#3a2b31]">
                         {conv.user.profile.name}
                     </h3>
-                    <p className="mt-1 truncate text-sm text-gray-500">
+                    <p className="mt-1 truncate text-sm text-[#88777c]">
                         {conv.lastMessage
                         ? conv.lastMessage.sender.id === getUserIdFromToken(token)
                             ? `You: ${conv.lastMessage.content}`
@@ -138,15 +129,16 @@ export default function MessagesPage() {
                     </div>
 
                     <div className="flex shrink-0 flex-col items-end gap-2">
-                    {conv.lastMessage && <span className="whitespace-nowrap text-xs text-gray-400">
+                    {conv.lastMessage && <span className="hidden whitespace-nowrap text-xs text-[#a08f94] sm:block">
                         {formatTimestamp(conv.lastMessage.createdAt)}
                     </span>}
-                    <ArrowUpRight size={17} className="text-rose-300 transition group-hover:text-rose-600" />
+                    <ArrowUpRight size={17} className="text-[#c9aaa0] transition group-hover:text-[#a65a55]" />
                     </div>
                 </button>
                 ))}
             </div>
-        </main><MobileBottomNav />
+        </main>
+        <MobileBottomNav />
     </div>
     
   );

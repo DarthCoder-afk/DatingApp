@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import Navbar from "@/src/components/NavBar";
-import { ArrowLeft, Camera, CheckCircle2, Save, UserRound } from "lucide-react";
+import { Camera, CheckCircle2, LogOut, Save, UserRound } from "lucide-react";
 import MobileBottomNav from "@/src/components/MobileBottomNav";
+import AppSkeleton from "@/src/components/AppSkeleton";
 
 interface Profile {
   name: string;
@@ -27,6 +27,7 @@ export default function EditProfilePage() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -44,9 +45,12 @@ export default function EditProfilePage() {
           }
         );
         const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
         setProfile(data);
       } catch {
         toast.error("Failed to load profile");
+      } finally {
+        setProfileLoading(false);
       }
     };
     fetchProfile();
@@ -94,48 +98,82 @@ export default function EditProfilePage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
+  if (profileLoading) {
+    return (
+      <div className="app-shell">
+        <div className="hidden md:block"><Navbar /></div>
+        <main className="app-page">
+          <header className="app-page-header">
+            <div><p className="eyebrow">Profile</p><h1>Make it feel like you.</h1><p className="subtle">Your details help the right people recognize you.</p></div>
+            <span className="app-page-mark"><UserRound size={20} /></span>
+          </header>
+          <AppSkeleton variant="profile" />
+        </main>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
+    <div className="app-shell">
       <div className="hidden md:block"><Navbar/></div>
-      <main className="mx-auto max-w-5xl px-5 pb-24 pt-6 md:px-10 md:py-12">
-        <header className="mb-6 flex items-center justify-between md:hidden"><Link href="/home" aria-label="Back to discover" className="text-rose-500"><ArrowLeft size={21} /></Link><h1 className="text-xl font-semibold text-slate-900">Edit profile</h1><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><UserRound size={18} /></span></header>
-        <div className="mb-8 hidden md:block"><Link href="/home" className="inline-flex items-center gap-2 text-sm font-semibold text-[#827074] transition hover:text-[#c65743]"><ArrowLeft size={16} /> Back to discover</Link><p className="mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-[#c65743]">Profile settings</p><h1 className="mt-2 font-serif text-4xl font-semibold text-[#2d2023]">Make your profile feel like you.</h1><p className="mt-3 max-w-2xl text-[#705b60]">Keep your details current so new connections can get to know the real you.</p></div>
+      <main className="app-page">
+        <header className="app-page-header">
+          <div><p className="eyebrow">Profile</p><h1>Make it feel like you.</h1><p className="subtle">Keep the details honest, current, and unmistakably yours.</p></div>
+          <span className="app-page-mark"><UserRound size={20} /></span>
+        </header>
         <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          <aside className="h-fit rounded-[2rem] border border-[#eadbd1] bg-[#fffdf9] p-6 shadow-[0_16px_40px_rgba(89,55,47,0.08)]">
+          <aside className="app-panel h-fit p-6">
             <div className="relative mx-auto h-44 w-44 overflow-hidden rounded-3xl bg-[#f7dfd2] ring-4 ring-[#f2d5c8] ring-offset-4 ring-offset-[#fffdf9]">
-              {useNextImage ? <Image src={avatarUrl} alt="Profile" fill sizes="176px" className="object-cover" /> : <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />}
+              {useNextImage ? <Image src={avatarUrl} alt="Profile" fill sizes="176px" className="object-cover" /> : <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+              </>}
             </div>
-            <div className="mt-6 text-center"><h2 className="text-xl font-bold text-gray-900">{profile.name || "Your profile"}{profile.age ? `, ${profile.age}` : ""}</h2><p className="mt-1 text-sm capitalize text-gray-500">{profile.gender || "Add your details"}</p></div>
-            <div className="my-6 h-px bg-rose-100" />
-            <label htmlFor="profile-photo" className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100"><Camera size={17} /> Change photo</label>
+            <div className="mt-6 text-center"><h2 className="font-serif text-2xl font-semibold text-[#33252b]">{profile.name || "Your profile"}{profile.age ? `, ${profile.age}` : ""}</h2><p className="mt-1 text-sm capitalize text-[#88777c]">{profile.gender || "Add your details"}</p></div>
+            <div className="my-6 h-px bg-[#eee4df]" />
+            <label htmlFor="profile-photo" className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f3e6e1] px-4 py-3 text-sm font-semibold text-[#9f514c] transition hover:bg-[#eddad3]"><Camera size={17} /> Change photo</label>
             <input id="profile-photo" type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
             <p className="mt-3 text-center text-xs leading-5 text-gray-500">Choose a clear photo that shows your face. JPG, PNG, or WEBP work best.</p>
             {photo && <p className="mt-4 truncate rounded-lg bg-emerald-50 px-3 py-2 text-center text-xs font-medium text-emerald-700"><CheckCircle2 className="mr-1 inline" size={14} /> {photo.name}</p>}
+            <div className="my-6 h-px bg-[#eee4df]" />
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#dfcfc8] bg-transparent px-4 py-3 text-sm font-semibold text-[#8f4f4c] transition hover:border-[#cfa99e] hover:bg-[#f8efeb]"
+            >
+              <LogOut size={17} /> Log out
+            </button>
           </aside>
 
-          <section className="rounded-[2rem] border border-[#eadbd1] bg-[#fffdf9] p-6 shadow-[0_16px_40px_rgba(89,55,47,0.08)] md:p-8">
+          <section className="app-panel p-6 md:p-8">
             <div className="mb-7 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f7dfd2] text-[#c65743]"><UserRound size={20} /></div><div><h2 className="font-bold text-[#2d2023]">About you</h2><p className="text-sm text-[#827074]">These details appear on your profile.</p></div></div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="profile-name" className="mb-2 block text-sm font-semibold text-gray-700">Name</label>
+            <label htmlFor="profile-name" className="app-label">Name</label>
             <input
               id="profile-name"
               type="text"
               value={profile.name}
               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+              className="app-input"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="profile-bio" className="mb-2 block text-sm font-semibold text-gray-700">Bio <span className="font-normal text-gray-400">(optional)</span></label>
+            <label htmlFor="profile-bio" className="app-label">Bio <span className="font-normal text-[#a19095]">(optional)</span></label>
             <textarea
               id="profile-bio"
               value={profile.bio}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+              className="app-input resize-none"
               rows={5}
               placeholder="Write a short description about yourself..."
             ></textarea>
@@ -143,14 +181,14 @@ export default function EditProfilePage() {
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="profile-gender" className="mb-2 block text-sm font-semibold text-gray-700">Gender</label>
+              <label htmlFor="profile-gender" className="app-label">Gender</label>
               <select
                 id="profile-gender"
                 value={profile.gender}
                 onChange={(e) =>
                   setProfile({ ...profile, gender: e.target.value })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+                className="app-input"
               >
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
@@ -160,7 +198,7 @@ export default function EditProfilePage() {
             </div>
 
             <div>
-              <label htmlFor="profile-age" className="mb-2 block text-sm font-semibold text-gray-700">Age</label>
+              <label htmlFor="profile-age" className="app-label">Age</label>
               <input
                 id="profile-age"
                 type="number"
@@ -168,7 +206,7 @@ export default function EditProfilePage() {
                 onChange={(e) =>
                   setProfile({ ...profile, age: parseInt(e.target.value) })
                 }
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+                className="app-input"
                 min={18}
                 required
               />
@@ -178,7 +216,7 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#c95744] px-4 py-3 font-semibold text-white shadow-lg shadow-[#e8b8ab] transition hover:bg-[#a94435] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4a2e3a] px-4 py-3 font-semibold text-white shadow-lg shadow-[#d8c7c0] transition hover:bg-[#38212b] disabled:cursor-not-allowed disabled:opacity-70"
           >{loading ? "Saving changes..." : <><Save size={18} /> Save changes</>}
            
           </button>

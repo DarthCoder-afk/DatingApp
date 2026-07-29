@@ -6,6 +6,7 @@ import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import NavBar from "@/src/components/NavBar";
 import { ArrowLeft, MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
+import AppSkeleton from "@/src/components/AppSkeleton";
 
 interface Message {
   id?: number;
@@ -65,8 +66,8 @@ export default function ChatPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         setMessages(data);
-      } catch (err: any) {
-        toast.error(err.message || "You cannot access this chat.");
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : "You cannot access this chat.");
       } finally {
         setLoading(false);
       }
@@ -123,14 +124,22 @@ export default function ChatPage() {
     // message immediately even if the socket has not finished joining the room.
     setMessages((prev) => prev.some((message) => message.id === savedMessage.id) ? prev : [...prev, savedMessage]);
     setNewMessage("");
-  } catch (err: any) {
-    toast.error(err.message || "Failed to send message");
+  } catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : "Failed to send message");
   }
 };
 
   if (loading)
     return (
-      <div className="min-h-screen bg-rose-50"><NavBar /><div className="mx-auto max-w-5xl px-6 py-10"><div className="h-[calc(100vh-150px)] animate-pulse rounded-3xl bg-white" /></div>
+      <div className="app-shell">
+        <div className="hidden md:block"><NavBar /></div>
+        <main className="app-page">
+          <header className="app-page-header">
+            <div><p className="eyebrow">Conversation</p><h1>Opening your messages.</h1><p className="subtle">Bringing the thread back into view.</p></div>
+            <span className="app-page-mark"><MessageCircle size={20} /></span>
+          </header>
+          <AppSkeleton variant="chat" />
+        </main>
       </div>
     );
 
@@ -145,11 +154,11 @@ export default function ChatPage() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#f7dfd2] text-[#c65743]"><MessageCircle size={20} /></div>
               <div className="min-w-0"><h1 className="truncate font-serif text-xl font-semibold text-[#2d2023]">{otherParticipant?.name || "Your conversation"}</h1><p className="text-xs text-[#827074]">A space for a real connection</p></div>
             </div>
-            <span className="hidden items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 sm:inline-flex"><Sparkles size={14} /> Matched</span>
+            <span className="hidden items-center gap-1.5 rounded-full bg-[#f3e6e1] px-3 py-1.5 text-xs font-semibold text-[#9f514c] sm:inline-flex"><Sparkles size={14} /> Matched</span>
           </header>
 
         <div className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,_rgba(214,107,83,0.13),_transparent_32%),linear-gradient(to_bottom,_#fffaf5,_#f8f2eb)] px-4 py-6 md:px-7">
-          {messages.length === 0 ? <div className="flex h-full flex-col items-center justify-center text-center"><div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-rose-100 text-rose-600"><MessageCircle size={26} /></div><h2 className="mt-5 text-xl font-bold text-gray-900">Start the conversation</h2><p className="mt-2 max-w-sm text-sm leading-6 text-gray-600">Try a thoughtful hello, a shared interest, or something that made you smile today.</p></div> : <div className="space-y-5">
+          {messages.length === 0 ? <div className="flex h-full flex-col items-center justify-center text-center"><div className="app-empty-icon"><MessageCircle size={26} /></div><h2 className="mt-5 font-serif text-2xl font-semibold text-[#33252b]">Start the conversation.</h2><p className="mt-2 max-w-sm text-sm leading-6 text-[#806f73]">Try a thoughtful hello, a shared interest, or something that made you smile today.</p></div> : <div className="space-y-5">
           {messages.map((msg, idx) => {
             const isMine = msg.sender.id === userId;
             const avatarUrl = msg.sender.profile.photoUrl || `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(`${msg.sender.profile.name}-${msg.sender.id}`)}&backgroundColor=ffe4e6`;
@@ -158,7 +167,10 @@ export default function ChatPage() {
                 key={msg.id ?? `${msg.createdAt}-${idx}`}
                 className={`flex items-end gap-2.5 ${isMine ? "justify-end" : "justify-start"}`}
               >
-                {!isMine && <img src={avatarUrl} alt={msg.sender.profile.name} className="h-9 w-9 shrink-0 self-end rounded-xl border border-rose-100 bg-rose-50 object-cover" />}
+                {!isMine && <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={avatarUrl} alt={msg.sender.profile.name} className="h-9 w-9 shrink-0 self-end rounded-xl border border-rose-100 bg-rose-50 object-cover" />
+                </>}
                 <div className={`max-w-[78%] md:max-w-[65%] ${isMine ? "items-end" : "items-start"}`}>
                   {!isMine && <p className="mb-1 px-1 text-xs font-semibold text-gray-500">{msg.sender.profile.name}</p>}
                   <div className={`rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${isMine ? "rounded-br-md bg-[#c95744] text-white shadow-[#e8b8ab]" : "rounded-bl-md border border-[#eadbd1] bg-[#fffdf9] text-[#4e3b3f]"}`}><p className="break-words">{msg.content}</p></div>
@@ -180,13 +192,13 @@ export default function ChatPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Write a message..."
-            className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+            className="app-input min-w-0 flex-1"
           />
           <button
             type="submit"
             disabled={!newMessage.trim()}
             aria-label="Send message"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#c95744] text-white shadow-lg shadow-[#e8b8ab] transition hover:bg-[#a94435] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#4a2e3a] text-white shadow-lg shadow-[#d8c7c0] transition hover:bg-[#38212b] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <SendHorizontal size={19} />
           </button>

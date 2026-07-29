@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Compass, Heart, LogOut, Menu, MessageCircle, Settings, X } from "lucide-react";
+import { ChevronDown, Compass, Heart, Menu, MessageCircle, Settings, X } from "lucide-react";
 import Image from "next/image";
 
 type Profile = {
@@ -13,19 +13,40 @@ type Profile = {
   photoUrl?: string | null;
 };
 
+const navigationLinks = [
+  { href: "/home", label: "Discover", icon: Compass },
+  { href: "/matchlist", label: "Matches", icon: Heart },
+  { href: "/messages", label: "Messages", icon: MessageCircle },
+];
+
+function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  return (
+    <>
+      {navigationLinks.map(({ href, label, icon: Icon }) => (
+        <Link
+          key={href}
+          href={href}
+          onClick={onNavigate}
+          className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200 ${
+            pathname === href
+              ? "bg-[#f5e8e3] text-[#9f514c] font-semibold"
+              : "text-[#6f5d63] hover:bg-[#f8efeb] hover:text-[#9f514c]"
+          }`}
+        >
+          <Icon size={16} strokeWidth={pathname === href ? 2.5 : 2} />
+          {label}
+        </Link>
+      ))}
+    </>
+  );
+}
+
 export default function Navbar() {
-  const router = useRouter();
   const pathname = usePathname();
   const [openProfile, setOpenProfile] = useState(false);
   const [openMobile, setOpenMobile] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
-
-  // Close menus on route change
-  useEffect(() => {
-    setOpenMobile(false);
-    setOpenProfile(false);
-  }, [pathname]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -66,34 +87,6 @@ export default function Navbar() {
           .toUpperCase()
       : "U";
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
-
-  const NavLinks = () => (
-    <>
-      {[
-        { href: "/home", label: "Discover", icon: Compass },
-        { href: "/matchlist", label: "Matches", icon: Heart },
-        { href: "/messages", label: "Messages", icon: MessageCircle },
-      ].map(({ href, label, icon: Icon }) => (
-        <Link
-          key={href}
-          href={href}
-          className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200 ${
-            pathname === href
-              ? "bg-rose-100 text-rose-700 font-semibold"
-              : "text-gray-600 hover:bg-rose-50 hover:text-rose-600"
-          }`}
-        >
-          <Icon size={16} strokeWidth={pathname === href ? 2.5 : 2} />
-          {label}
-        </Link>
-      ))}
-    </>
-  );
-
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-[#eadbd1]/80 bg-[#fffdf9]/90 px-4 py-3 shadow-sm shadow-[#e9ddd4]/60 backdrop-blur-xl md:px-10">
         {/* MOBILE MENU ICON */}
@@ -116,8 +109,8 @@ export default function Navbar() {
       </Link>
 
       {/* DESKTOP NAV */}
-      <div className="hidden items-center gap-1 rounded-2xl border border-rose-100 bg-white/80 p-1 text-sm font-medium shadow-sm md:flex">
-        <NavLinks />
+      <div className="hidden items-center gap-1 rounded-2xl border border-[#eadfd9] bg-white/80 p-1 text-sm font-medium shadow-sm md:flex">
+        <NavLinks pathname={pathname} />
       </div>
 
       {/* RIGHT: Profile */}
@@ -164,21 +157,11 @@ export default function Navbar() {
                       <Settings size={16} /> Edit profile
                     </Link>
                   </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-rose-600 transition hover:bg-rose-50"
-                    >
-                      <LogOut size={16} /> Log out
-                    </button>
-                  </li>
                 </ul>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-      
       </div>
 
       {/* MOBILE NAV */}
@@ -191,7 +174,7 @@ export default function Navbar() {
             transition={{ duration: 0.2 }}
             className="absolute left-0 top-full flex w-full flex-col items-center space-y-2 border-t border-rose-100 bg-white/95 px-4 py-4 text-sm text-gray-700 shadow-xl shadow-rose-100/70 backdrop-blur-xl md:hidden z-40"
           >
-            <NavLinks />
+            <NavLinks pathname={pathname} onNavigate={() => setOpenMobile(false)} />
           </motion.div>
         )}
       </AnimatePresence>
