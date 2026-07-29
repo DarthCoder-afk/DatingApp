@@ -107,10 +107,10 @@ export default function Navbar() {
       {/* LEFT: Logo */}
       <Link href="/home" className="flex items-center gap-2.5">
         <motion.span
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#d66750] to-[#a43f4d] text-white shadow-lg shadow-[#e8b8ab]"
+          className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-[#4a2e3a] shadow-md shadow-[#d8c7c0]"
           whileHover={{ scale: 1.1 }}
         >
-          <Heart size={20} fill="currentColor" />
+          <Image src="/heartlink-icon.png" alt="" width={40} height={40} className="h-full w-full object-cover" />
         </motion.span>
         <span className="font-serif text-2xl font-semibold tracking-tight text-[#2d2023]">HeartLink</span>
       </Link>

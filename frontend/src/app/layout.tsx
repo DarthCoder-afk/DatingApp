@@ -18,6 +18,13 @@ export const metadata: Metadata = {
     description: "A warm, mobile-first way to discover profiles, match, and start conversations.",
     images: ["/og.png"],
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

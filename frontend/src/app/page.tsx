@@ -119,7 +119,7 @@ export default function LandingPage() {
       <header className={`lp-nav ${scrolled ? "lp-nav-scrolled" : ""}`}>
         <div className="lp-nav-inner">
           <Link href="/" aria-label="HeartLink home" className="lp-brand">
-            <span className="lp-brand-mark"><Heart size={17} fill="currentColor" /></span>
+            <span className="lp-brand-mark"><Image src="/heartlink-icon.png" alt="" width={32} height={32} /></span>
             <span>HeartLink</span>
           </Link>
           <nav aria-label="Landing page" className="lp-nav-links">
@@ -309,7 +309,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="lp-footer">
-        <Link href="/" className="lp-brand"><span className="lp-brand-mark"><Heart size={16} fill="currentColor" /></span><span>HeartLink</span></Link>
+        <Link href="/" className="lp-brand"><span className="lp-brand-mark"><Image src="/heartlink-icon.png" alt="" width={32} height={32} /></span><span>HeartLink</span></Link>
         <p>Meet people worth knowing.</p>
         <nav aria-label="Footer navigation"><a href="#product">Product</a><a href="#safety">Safety</a><Link href="/login">Sign in</Link><Link href="/register">Create account</Link></nav>
         <small>© {new Date().getFullYear()} HeartLink.</small>
