@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "daisyui": "^5.3.10",
     "framer-motion": "^12.23.24",
     "gsap": "^3.15.0",
