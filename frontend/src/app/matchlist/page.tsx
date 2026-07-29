@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import toast from "react-hot-toast";
 import Navbar from "@/src/components/NavBar";
 import MatchCard from "@/src/components/MatchCard";
 import { useRouter } from "next/navigation";
-import { Bell, Heart, Inbox, Send, Sparkles } from "lucide-react";
+import { Heart, Inbox, Send } from "lucide-react";
 import MobileBottomNav from "@/src/components/MobileBottomNav";
+import AppSkeleton from "@/src/components/AppSkeleton";
 
 interface Profile {
   id: number;
@@ -32,8 +32,10 @@ interface Match {
   createdAt: string;
 }
 
+type MatchTab = "given" | "received" | "mutual";
+
 export default function MatchListPage() {
-  const [tab, setTab] = useState<"given" | "received" | "mutual">("mutual");
+  const [tab, setTab] = useState<MatchTab>("mutual");
   const [likesGiven, setLikesGiven] = useState<Like[]>([]);
   const [likesReceived, setLikesReceived] = useState<Like[]>([]);
   const [mutualLikes, setMutualLikes] = useState<Match[]>([]);
@@ -101,21 +103,30 @@ export default function MatchListPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-rose-50"><Navbar /><div className="mx-auto max-w-6xl px-6 py-12"><div className="h-9 w-48 animate-pulse rounded-lg bg-rose-100" /><div className="mt-8 grid gap-6 md:grid-cols-3">{[1, 2, 3].map((item) => <div key={item} className="h-80 animate-pulse rounded-3xl bg-white" />)}</div></div></div>
+      <div className="app-shell">
+        <div className="hidden md:block"><Navbar /></div>
+        <main className="app-page">
+          <header className="app-page-header">
+            <div><p className="eyebrow">Connections</p><h1>People who noticed you.</h1><p className="subtle">Your matches and likes are gathering here.</p></div>
+            <span className="app-page-mark"><Heart size={20} /></span>
+          </header>
+          <AppSkeleton variant="cards" />
+        </main>
+        <MobileBottomNav />
+      </div>
     );
 
   return (
-    <div className="min-h-screen bg-[#f8f2eb] text-[#2d2023]">
+    <div className="app-shell">
         <div className="hidden md:block"><Navbar /></div>
-      <main className="mx-auto max-w-6xl px-5 pb-24 pt-6 md:px-10 md:py-12">
-      <header className="mb-6 flex items-center justify-between md:hidden"><button aria-label="Notifications" className="text-rose-500"><Bell size={20} /></button><h1 className="text-xl font-semibold text-slate-900">Matches</h1><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><Heart size={18} fill="currentColor" /></span></header>
-      <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 hidden rounded-[2rem] bg-[#3b272d] p-8 text-white shadow-[0_18px_40px_rgba(65,39,45,0.18)] md:block">
-        <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-sm font-medium text-[#f2b9a8]"><Sparkles size={15} /> Your connections</p>
-        <div className="mt-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><h1 className="font-serif text-4xl font-semibold">The people who felt the spark.</h1><p className="mt-3 max-w-2xl text-white/70">See who you&apos;ve connected with, revisit likes, and turn a mutual match into a conversation.</p></div><div className="rounded-2xl bg-white/10 px-4 py-3"><p className="text-xs text-white/60">Mutual matches</p><p className="text-2xl font-bold">{mutualLikes.length}</p></div></div>
-      </motion.section>
+      <main className="app-page">
+      <motion.header initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="app-page-header">
+        <div><p className="eyebrow">Connections</p><h1>People who noticed you.</h1><p className="subtle">A quiet place for mutual interest and promising hellos.</p></div>
+        <span className="app-page-mark"><Heart size={20} fill="currentColor" /></span>
+      </motion.header>
 
       {/* Tabs */}
-      <div className="mb-8 flex w-full gap-2 overflow-x-auto rounded-2xl border border-[#eadbd1] bg-[#fffdf9] p-2 shadow-sm md:justify-center">
+      <div className="app-tabs">
         {[
           { key: "mutual", label: "Matches", icon: Heart, count: mutualLikes.length },
           { key: "given", label: "Liked", icon: Send, count: likesGiven.length },
@@ -123,14 +134,10 @@ export default function MatchListPage() {
         ].map(({ key, label, icon: Icon, count }) => (
           <button
             key={key}
-            onClick={() => setTab(key as any)}
-            className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
-              tab === key
-                ? "bg-[#c95744] text-white shadow-md shadow-[#e8b8ab]"
-                : "text-[#705b60] hover:bg-[#fff1e9] hover:text-[#c65743]"
-            }`}
+            onClick={() => setTab(key as MatchTab)}
+            className={`app-tab ${tab === key ? "app-tab-active" : ""}`}
           >
-            <Icon size={16} fill={key === "mutual" ? "currentColor" : "none"} /> {label} <span className={`rounded-full px-1.5 py-0.5 text-xs ${tab === key ? "bg-white/20" : "bg-rose-50 text-rose-600"}`}>{count}</span>
+            <Icon size={16} fill={key === "mutual" ? "currentColor" : "none"} /> {label} <span className="app-count">{count}</span>
           </button>
         ))}
       </div>
@@ -138,7 +145,7 @@ export default function MatchListPage() {
       {/* Cards Grid */}
       <motion.div
         layout
-        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        className="app-card-grid">
         {tab === "mutual" &&
             mutualLikes.map((match) => (
                 <MatchCard
@@ -168,7 +175,7 @@ export default function MatchListPage() {
             />
           ))}
       </motion.div>
-      {((tab === "mutual" && !mutualLikes.length) || (tab === "given" && !likesGiven.length) || (tab === "received" && !likesReceived.length)) && <div className="rounded-[2rem] border border-dashed border-[#dfcfc5] bg-[#fffaf4] px-6 py-14 text-center"><Heart className="mx-auto text-[#e5a796]" size={34} /><h2 className="mt-4 font-serif text-2xl font-semibold text-[#2d2023]">Nothing here just yet</h2><p className="mt-2 text-sm text-[#705b60]">Keep exploring profiles—new connections begin with a small hello.</p></div>}
+      {((tab === "mutual" && !mutualLikes.length) || (tab === "given" && !likesGiven.length) || (tab === "received" && !likesReceived.length)) && <div className="app-empty"><span className="app-empty-icon"><Heart size={25} /></span><h2>Nothing here just yet.</h2><p>Keep exploring at your own pace. New connections begin with one thoughtful choice.</p></div>}
       </main>
       <MobileBottomNav />
     </div>
