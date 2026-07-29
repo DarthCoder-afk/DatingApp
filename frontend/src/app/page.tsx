@@ -1,211 +1,319 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
+  Check,
+  Compass,
   Heart,
-  HeartHandshake,
+  LockKeyhole,
+  Menu,
   MessageCircle,
   ShieldCheck,
-  HeartPlus,
-  WandSparkles,
-  Sparkles,
-  Users,
+  UserRound,
+  X,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
-const features = [
-  {
-    icon: WandSparkles,
-    title: "Discover your kind of people",
-    description: "Explore profiles that match your preferences, pace, and personality.",
-  },
-  {
-    icon: HeartHandshake,
-    title: "Match with intention",
-    description: "A match happens when the feeling is mutual—no awkward guesswork needed.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Start real conversations",
-    description: "Move from a spark to a conversation with private, real-time messaging.",
-  },
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const journey = [
+  ["01", "Create your profile", "Share the details and photo that feel most like you."],
+  ["02", "Discover thoughtfully", "Meet one person at a time in a calm, focused view."],
+  ["03", "Choose naturally", "Express interest privately. A match happens when it’s mutual."],
+  ["04", "Start a conversation", "Move from an introduction to a comfortable, real-time chat."],
 ];
 
-export default function Home() {
+export default function LandingPage() {
+  const root = useRef<HTMLElement>(null);
+  const preview = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useGSAP(() => {
+    const media = gsap.matchMedia();
+
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+      intro
+        .from(".lp-nav", { y: -18, opacity: 0, duration: 0.55 })
+        .from(".hero-eyebrow", { y: 14, opacity: 0, duration: 0.5 }, "-=.18")
+        .from(".hero-line", { yPercent: 105, duration: 0.75, stagger: 0.09 }, "-=.28")
+        .from(".hero-support", { y: 16, opacity: 0, duration: 0.55 }, "-=.35")
+        .from(".hero-actions", { y: 14, opacity: 0, duration: 0.5 }, "-=.3")
+        .from(".phone-main", { y: 44, opacity: 0, duration: 0.8 }, "-=.55")
+        .from(".preview-float", { y: 20, opacity: 0, duration: 0.55, stagger: 0.1 }, "-=.4")
+        .from(".phone-detail", { scaleX: 0, transformOrigin: "left", duration: 0.45 }, "-=.2");
+
+      gsap.utils.toArray<HTMLElement>(".lp-reveal").forEach((element) => {
+        gsap.from(element, {
+          y: 28,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power2.out",
+          scrollTrigger: { trigger: element, start: "top 84%", once: true },
+        });
+      });
+
+      gsap.from(".journey-step", {
+        opacity: 0,
+        x: -24,
+        stagger: 0.12,
+        duration: 0.62,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".journey-list", start: "top 78%", once: true },
+      });
+
+      gsap.from(".chat-bubble", {
+        opacity: 0,
+        y: 12,
+        stagger: 0.18,
+        duration: 0.5,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".conversation-preview", start: "top 74%", once: true },
+      });
+
+      const pointerFine = window.matchMedia("(pointer: fine)").matches;
+      if (pointerFine && preview.current) {
+        const node = preview.current;
+        const xTo = gsap.quickTo(node, "x", { duration: 0.45, ease: "power2.out" });
+        const yTo = gsap.quickTo(node, "y", { duration: 0.45, ease: "power2.out" });
+        const move = (event: PointerEvent) => {
+          const box = node.getBoundingClientRect();
+          xTo(((event.clientX - box.left) / box.width - 0.5) * 10);
+          yTo(((event.clientY - box.top) / box.height - 0.5) * 8);
+        };
+        const leave = () => { xTo(0); yTo(0); };
+        node.addEventListener("pointermove", move);
+        node.addEventListener("pointerleave", leave);
+        return () => {
+          node.removeEventListener("pointermove", move);
+          node.removeEventListener("pointerleave", leave);
+        };
+      }
+    });
+
+    media.add("(prefers-reduced-motion: reduce)", () => {
+      gsap.set(".hero-line, .hero-eyebrow, .hero-support, .hero-actions, .phone-main, .preview-float, .lp-reveal, .journey-step, .chat-bubble", {
+        clearProps: "all",
+        opacity: 1,
+      });
+    });
+
+    return () => media.revert();
+  }, { scope: root });
+
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f8f2eb] text-[#2d2023]">
-      {/* Header */}
-      <motion.header
-        initial={{ y: -40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10"
-      >
-        <div
-          className="flex items-center gap-2 font-serif text-2xl font-semibold text-[#2d2023]"
-         
-        >
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#c95744] text-white shadow-lg shadow-[#e8b8ab]"><Heart fill="currentColor" size={20} /></span>
-          <span>HeartLink</span>
+    <main ref={root} className="landing-shell">
+      <header className={`lp-nav ${scrolled ? "lp-nav-scrolled" : ""}`}>
+        <div className="lp-nav-inner">
+          <Link href="/" aria-label="HeartLink home" className="lp-brand">
+            <span className="lp-brand-mark"><Image src="/heartlink-icon.png" alt="" width={32} height={32} /></span>
+            <span>HeartLink</span>
+          </Link>
+          <nav aria-label="Landing page" className="lp-nav-links">
+            <a href="#product">Product</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#safety">Safety</a>
+          </nav>
+          <div className="lp-nav-actions">
+            <Link href="/login" className="lp-sign-in">Sign in</Link>
+            <Link href="/register" className="lp-nav-cta">Create account</Link>
+          </div>
+          <button
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lp-menu-button"
+          >
+            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
+        </div>
+        <div id="mobile-menu" className={`lp-mobile-menu ${menuOpen ? "is-open" : ""}`}>
+          <a href="#product" onClick={() => setMenuOpen(false)}>Product</a>
+          <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
+          <a href="#safety" onClick={() => setMenuOpen(false)}>Safety</a>
+          <Link href="/login">Sign in</Link>
+          <Link href="/register" className="lp-mobile-cta">Create account</Link>
+        </div>
+      </header>
+
+      <section className="lp-hero">
+        <div className="hero-copy">
+          <p className="hero-eyebrow">A mobile-first way to meet</p>
+          <h1 aria-label="Meet people worth knowing.">
+            <span className="hero-line-wrap"><span className="hero-line">Meet people</span></span>
+            <span className="hero-line-wrap"><span className="hero-line hero-line-accent">worth knowing.</span></span>
+          </h1>
+          <p className="hero-support">
+            Discover profiles, find mutual connections, and start conversations through a dating experience designed around mobile.
+          </p>
+          <div className="hero-actions">
+            <Link href="/register" className="lp-primary-button">Create your profile <ArrowRight size={18} /></Link>
+            <Link href="/login" className="lp-secondary-button">I have an account</Link>
+          </div>
+          <p className="mobile-note"><span /> A responsive web experience, at its best in your hand.</p>
         </div>
 
-        <nav className="flex items-center gap-6">
-          <Link href="/login" className="text-sm font-medium text-[#5f4a4f] hover:text-[#c65743]">
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-full bg-[#c95744] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#e8b8ab] transition hover:bg-[#a94435]"
-          >
-            Register
-          </Link>
-        </nav>
-      </motion.header>
-
-      {/* Hero Section */}
-      <section className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-10 md:grid-cols-[0.9fr_1.1fr] md:px-10 md:pb-28 md:pt-14">
-        {/* Left text content */}
-        <motion.div
-          initial={{ x: -50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-xl space-y-6 text-center md:text-left"
-        >
-          <p className="inline-flex items-center gap-2 rounded-full border border-[#eadbd1] bg-[#fffaf4] px-4 py-2 text-sm font-medium text-[#a94435] shadow-sm">
-            <HeartPlus size={16} /> Find meaningful connections
-          </p>
-
-          <h1 className="font-serif text-5xl font-semibold leading-[0.96] tracking-[-0.045em] text-[#2d2023] md:text-7xl">
-            A good story begins with <span className="text-[#c65743]">hello.</span>
-          </h1>
-          <p className="max-w-lg text-lg leading-8 text-[#705b60]">
-            Meet people who feel like possibility. Discover, match, and take your time getting to know what could be.
-          </p>
-          <div className="order-1 md:order-2 flex justify-center md:justify-start gap-4">
-            <Link
-              href="/register"
-              className="rounded-full bg-[#c95744] px-6 py-3 text-lg font-semibold text-white shadow-xl shadow-[#e8b8ab] transition hover:bg-[#a94435]"
-            >
-              Create your profile <ArrowRight className="inline-block" size={18} />
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-full border border-[#dfcfc5] bg-[#fffaf4] px-6 py-3 text-lg font-medium text-[#694b50] transition hover:border-[#d79a89] hover:bg-white"
-            >
-              I have an account
-            </Link>
+        <div ref={preview} className="hero-preview" aria-label="HeartLink mobile product preview">
+          <div className="preview-float match-note">
+            <div className="mini-avatars">
+              <span>A</span><span>N</span>
+            </div>
+            <div><strong>It’s mutual</strong><small>Say hello when you’re ready</small></div>
           </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ x: 50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-          className="relative order-2 overflow-hidden rounded-[2.2rem] shadow-[0_28px_72px_rgba(78,42,45,0.2)] md:order-1"
-        >
-          <div className="absolute inset-0 z-10 bg-linear-to-t from-[#2d2023]/45 via-transparent to-transparent" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/heartlink-landing-editorial.png" alt="Two people enjoying a coffee date" className="aspect-[4/3] w-full object-cover" />
-          <div className="absolute bottom-6 left-6 z-20 rounded-2xl border border-white/20 bg-[#2d2023]/65 px-4 py-3 text-white backdrop-blur"><p className="text-xs uppercase tracking-[0.18em] text-[#f5c5b5]">HeartLink note</p><p className="mt-1 font-serif text-xl">Make room for magic.</p></div>
-        </motion.div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 pb-20 pt-8 md:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="rounded-[2rem] border border-[#eadbd1] bg-[#fffdf9] px-6 py-10 shadow-[0_16px_44px_rgba(89,55,47,0.08)] md:px-10"
-        >
-          <div className="mx-auto mb-10 max-w-2xl text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#c65743]">Made for connection</p>
-            <h2 className="font-serif text-3xl font-semibold text-[#2d2023] md:text-4xl">Every detail gives connection room to grow</h2>
-            <p className="mt-4 text-[#705b60]">HeartLink keeps the experience simple, thoughtful, and focused on people—not endless scrolling.</p>
+          <div className="phone-main">
+            <div className="phone-speaker" />
+            <div className="phone-topbar"><span>Discover</span><Compass size={18} /></div>
+            <div className="phone-profile">
+              <Image
+                src="/images/heartlink-landing-editorial.png"
+                alt="A warm profile moment in the HeartLink discovery experience"
+                fill
+                priority
+                sizes="(max-width: 700px) 78vw, 340px"
+                className="phone-profile-image"
+              />
+              <div className="phone-profile-shade" />
+              <div className="photo-dots"><i className="active" /><i /><i /></div>
+              <div className="phone-profile-copy">
+                <small>Nearby</small>
+                <h2>Avery, 26</h2>
+                <p>Coffee walks, film photography, and finding the city’s best dumplings.</p>
+              </div>
+            </div>
+            <div className="phone-controls">
+              <button type="button" aria-label="Pass profile"><X size={21} /></button>
+              <button type="button" aria-label="Like profile" className="phone-like"><Heart size={20} fill="currentColor" /></button>
+            </div>
+            <div className="phone-tabbar">
+              <span className="selected"><Compass size={17} />Discover</span>
+              <span><Heart size={17} />Matches</span>
+              <span><MessageCircle size={17} />Chat</span>
+              <span><UserRound size={17} />Profile</span>
+            </div>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {features.map(({ icon: Icon, title, description }, index) => (
-              <motion.article
-                key={title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ delay: index * 0.12, duration: 0.5 }}
-                className="rounded-2xl border border-[#eee2d9] bg-[#fffaf4] p-6 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#eadbd1]"
-              >
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#f7dfd2] text-[#c65743]">
-                  <Icon size={22} />
-                </div>
-                <h3 className="text-lg font-semibold text-[#2d2023]">{title}</h3>
-                <p className="mt-2 leading-7 text-[#705b60]">{description}</p>
-              </motion.article>
-            ))}
+          <div className="preview-float chat-note">
+            <span className="chat-avatar">N</span>
+            <div><strong>Noah</strong><small>That hidden café sounds perfect.</small></div>
+            <span className="chat-time">now</span>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 pb-20 md:grid-cols-[0.9fr_1.1fr] md:px-10">
-        <motion.div
-          initial={{ opacity: 0, x: -24 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="rounded-[2rem] bg-[#3b272d] p-8 text-white shadow-[0_18px_40px_rgba(65,39,45,0.18)] md:p-10"
-        >
-          <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#d66b53] text-white"><Users size={23} /></span>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#f2b9a8]">Your journey, your pace</p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight">A better way to make the first move.</h2>
-          <p className="mt-4 leading-7 text-white/72">Set up your profile, browse thoughtfully, and connect when it feels right. There is no rush—just room for a genuine spark.</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col justify-center"
-        >
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c65743]">How it works</p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[#2d2023]">Three easy steps to a new connection</h2>
-          <ol className="mt-7 space-y-5">
-            {["Create a profile that feels like you.", "Discover people who catch your eye.", "Match, chat, and see where it goes."].map((step, index) => (
-              <li key={step} className="flex items-center gap-4 text-[#5f4a4f]">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f7dfd2] font-semibold text-[#c65743]">{index + 1}</span>
-                <span className="font-medium">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </motion.div>
+      <section id="product" className="mobile-first-section">
+        <div className="lp-section-copy lp-reveal">
+          <p className="lp-kicker">Made for real moments</p>
+          <h2>The best dating experience fits in one hand.</h2>
+          <p>HeartLink is a mobile-first web experience shaped around natural gestures, quick decisions, and conversations you can return to whenever it feels right.</p>
+          <ul className="benefit-list">
+            <li><Check size={17} /> Focused, one-person-at-a-time discovery</li>
+            <li><Check size={17} /> Controls placed comfortably within thumb reach</li>
+            <li><Check size={17} /> Matches and messages kept easy to follow</li>
+          </ul>
+        </div>
+        <div className="reach-preview lp-reveal">
+          <div className="reach-screen">
+            <div className="reach-photo">
+              <Image src="/images/heartlink-date-journal-hero.png" alt="HeartLink profile discovery preview" fill sizes="360px" className="object-cover" />
+              <span>Sofia, 28</span>
+            </div>
+            <div className="reach-zone">
+              <span><X size={19} /></span>
+              <span className="reach-like"><Heart size={19} fill="currentColor" /></span>
+            </div>
+            <div className="reach-tabs"><Compass /><Heart /><MessageCircle /><UserRound /></div>
+          </div>
+          <div className="reach-caption"><span>Comfort zone</span><p>Primary actions live where your thumb naturally rests.</p></div>
+        </div>
       </section>
 
-      <section className="px-6 pb-16 md:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto flex max-w-5xl flex-col items-center gap-5 rounded-[2rem] bg-[#3b272d] px-8 py-14 text-center text-white shadow-[0_18px_40px_rgba(65,39,45,0.18)] md:px-14"
-        >
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-[#f2b9a8]"><ShieldCheck size={25} /></span>
-          <h2 className="font-serif text-4xl font-semibold">Your next connection could start today.</h2>
-          <p className="max-w-xl text-white/70">Join HeartLink and make space for the people, conversations, and possibilities that matter.</p>
-          <Link href="/register" className="mt-2 rounded-full bg-[#d66b53] px-6 py-3 font-semibold shadow-lg shadow-black/10 transition hover:bg-[#e17b63]">
-            Join HeartLink
-          </Link>
-        </motion.div>
+      <section id="how-it-works" className="journey-section">
+        <div className="journey-heading lp-reveal">
+          <p className="lp-kicker">From profile to conversation</p>
+          <h2>One connected, human journey.</h2>
+        </div>
+        <div className="journey-list">
+          {journey.map(([number, title, copy]) => (
+            <article className="journey-step" key={number}>
+              <span>{number}</span>
+              <div><h3>{title}</h3><p>{copy}</p></div>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* Footer */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="border-t border-[#eadbd1] px-6 py-8 text-center text-sm text-[#827074]"
-      >
-        © {new Date().getFullYear()} HeartLink. All rights reserved.
-      </motion.footer>
+      <section className="discovery-showcase">
+        <div className="discovery-collage lp-reveal">
+          <div className="portrait-panel">
+            <Image src="/images/heartlink-register-editorial.png" alt="Profile discovery with room for personality" fill sizes="(max-width: 800px) 90vw, 520px" className="object-cover" />
+            <div><small>A little about me</small><p>“The perfect Sunday starts with coffee and ends somewhere by the water.”</p></div>
+          </div>
+          <div className="bio-slip"><small>Avery’s profile</small><p>Photography · Coffee walks · Dumpling hunts</p></div>
+        </div>
+        <div className="lp-section-copy lp-reveal">
+          <p className="lp-kicker">More than a first glance</p>
+          <h2>Meet the person, not a pile of cards.</h2>
+          <p>A clear photo, a short biography, and the details someone chooses to share create a fuller introduction—without visual clutter or invented compatibility scores.</p>
+        </div>
+      </section>
+
+      <section className="conversation-section">
+        <div className="lp-section-copy lp-reveal">
+          <p className="lp-kicker">A match is only the beginning</p>
+          <h2>Make room for a real conversation.</h2>
+          <p>Mutual interest opens a private conversation. From there, HeartLink keeps the experience calm, readable, and focused on what you want to say next.</p>
+        </div>
+        <div className="conversation-preview lp-reveal">
+          <header><span className="conversation-avatar">N</span><div><strong>Noah</strong><small>Your match</small></div></header>
+          <div className="conversation-body">
+            <div className="chat-bubble received">You mentioned live music—what’s the best show you’ve seen lately?</div>
+            <div className="chat-bubble sent">A tiny jazz set downtown. I’m still thinking about it.</div>
+            <div className="chat-bubble received">That sounds like a very good second-date idea.</div>
+          </div>
+          <div className="conversation-composer"><span>Write a message…</span><button type="button" aria-label="Send message"><ArrowRight size={17} /></button></div>
+        </div>
+      </section>
+
+      <section id="safety" className="safety-section lp-reveal">
+        <div className="safety-mark"><ShieldCheck size={28} /></div>
+        <div>
+          <p className="lp-kicker">Your pace. Your boundaries.</p>
+          <h2>Connection should always come with control.</h2>
+        </div>
+        <div className="safety-points">
+          <p><LockKeyhole size={19} /><span><strong>Mutual by design</strong>Messaging begins after both people express interest.</span></p>
+          <p><UserRound size={19} /><span><strong>Your profile, your call</strong>Update what you share and how you appear at any time.</span></p>
+          <p><X size={19} /><span><strong>Leave a connection</strong>Unmatch whenever a conversation no longer feels right.</span></p>
+        </div>
+      </section>
+
+      <section className="final-cta lp-reveal">
+        <p className="lp-kicker">Ready when you are</p>
+        <h2>Your next conversation could start here.</h2>
+        <p>Designed for mobile, ready wherever a quiet moment finds you.</p>
+        <Link href="/register" className="lp-primary-button">Create your profile <ArrowRight size={18} /></Link>
+      </section>
+
+      <footer className="lp-footer">
+        <Link href="/" className="lp-brand"><span className="lp-brand-mark"><Image src="/heartlink-icon.png" alt="" width={32} height={32} /></span><span>HeartLink</span></Link>
+        <p>Meet people worth knowing.</p>
+        <nav aria-label="Footer navigation"><a href="#product">Product</a><a href="#safety">Safety</a><Link href="/login">Sign in</Link><Link href="/register">Create account</Link></nav>
+        <small>© {new Date().getFullYear()} HeartLink.</small>
+      </footer>
     </main>
-    
   );
 }
